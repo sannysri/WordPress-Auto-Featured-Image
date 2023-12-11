@@ -1,0 +1,104 @@
+.wp_afi .inside p h4{
+  width:100%;
+  float:left;
+}
+.wp_afi p.multi-option span {
+  margin-right: 10px;
+}
+.wp_afi p.multi-option span input {
+  margin-right: 4px;
+  margin-top: 2px;
+}
+.wp_afi .ui-sortable {
+  background: none repeat scroll 0 0 #FFFFFF;
+  border: 1px solid #D1D1D1;
+  border-radius: 10px;
+  float: left;
+  height: 30px;
+  overflow: hidden;
+  padding: 5px;
+  width: auto;
+}
+.wp_afi .ui-sortable li {
+  background: url("../images/move.gif") no-repeat scroll 7px 6px #E1E1E1;
+  border: 1px solid rgba(99, 99, 99, 0.2);
+  border-radius: 5px;
+  cursor: pointer;
+  float: left;
+  margin: 0 5px 0 0;
+  min-width: 70px;
+  padding: 5px 10px;
+  text-align: center;
+}
+.wp_afi .ui-sortable li:last-child {
+  margin: 0;
+}
+.wp_afi h4 {
+  float: left;
+  margin: 5px 0;
+  width: 100%;
+}
+.wp_afi span.separate {
+  margin: 20px;
+}
+.wp_afi p {
+  float: left;
+  width: 100%;
+  margin:0 0 15px;
+}
+.wp_afi span.anywhere {
+  float: left;
+  margin: 0 0 5px !important;
+  width: 100%;
+}
+.wp_afi .content_area {
+  width:100%;
+  float:left;
+}
+.wp_afi .wp_afi_left_area {
+  float: left;
+  max-width: 75%;
+  width: 100%;
+}
+.wp_afi .wp_afi_right_area {
+  float: right;
+  max-width: 24%;
+  width: 100%;
+}
+.wp_afi .wp_afi_left_area form label.post-type {
+  height: 20px;
+  line-height: 20px;
+  margin-right: 5px;
+  text-transform: capitalize;
+  vertical-align: middle;
+}
+#uploaded_thumb_preview {
+  margin-top: 10px;
+  max-width: 500px;
+  min-height: 100px;
+}
+#uploaded_thumb_preview img {
+  max-width: 100%;
+}
+.wp_afi_right_area .metabox-holder .postbox {
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+}
+.note {
+  color: #706C6C;
+  float: left;
+  font-size: 12px;
+  width: 100%;
+}
+div.updated {
+  float: left;
+  width: 98%;
+}
+form.paypal select, form.paypal input{
+  float: left;
+}
+form.paypal {
+  float: left;
+  margin-bottom: 10px;
+  width: 100%;
+}

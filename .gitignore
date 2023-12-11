@@ -1,0 +1,44 @@
+# Ignore WordPress core files
+wp-config.php
+wp-content/*
+!wp-content/plugins/
+wp-content/plugins/*
+!wp-content/themes/
+
+# Ignore build and temporary files
+node_modules/
+build/
+dist/
+*.log
+*.bak
+
+# Ignore IDE files
+.idea/
+.vscode/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore configuration files
+*.yml
+*.json
+
+# Ignore Composer files
+composer.phar
+/vendor/
+
+# Ignore local development files
+*.sql
+*.sql.gz
+
+# Ignore sensitive information
+config.php
+.env
+
+# Ignore logs
+*.log
+*.log.*
+
+# Ignore GitHub-specific files
+.github/
