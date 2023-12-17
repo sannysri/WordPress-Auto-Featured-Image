@@ -1,0 +1,6 @@
+.wpafi-select {
+    width: 100%; /* You can adjust the percentage or use a fixed width */
+	max-width: 400px;
+	height: 30px;
+	padding: 20px;
+}
