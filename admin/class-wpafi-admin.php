@@ -124,7 +124,7 @@ class WPAFI_Admin {
 
 		// Set post thumbnail if post meets all requirements.
 		if ( $this->is_post_meeting_criteria( $post_id, $options ) ) {
-			set_post_thumbnail( $post_id, $options['wpafi_default_thumb'] );
+			set_post_thumbnail( $post_id, $options['wpafi_default_thumb_id'] );
 		}
 	}
 
@@ -137,7 +137,7 @@ class WPAFI_Admin {
 	 * @return bool True if thumbnail should be set, false otherwise.
 	 */
 	public function is_post_meeting_criteria( $post_id, $options ) {
-		if ( empty( $options['wpafi_default_thumb'] ) ) {
+		if ( empty( $options['wpafi_default_thumb_id'] ) ) {
 			return;
 		}
 
@@ -155,19 +155,6 @@ class WPAFI_Admin {
 		if ( ! empty( $options['wpafi_categories'] ) && is_array( $options['wpafi_categories'] ) ) {
 			if ( 'page' !== $current_post_type && ! in_category( $options['wpafi_categories'], $post_id ) ) {
 				return false;
-			}
-		}
-
-		// Check taxonomy terms condition.
-		if ( 'page' !== $current_post_type && ! empty( $options['wpafi_taxonomy_terms'] ) && is_array( $options['wpafi_taxonomy_terms'] ) ) {
-			// Get all post terms.
-			$post_terms = wp_get_post_terms( $post_id, '', array( 'fields' => 'ids' ) );
-
-			// Check for all post terms.
-			foreach ( $options['wpafi_taxonomy_terms'] as $taxonomy_term ) {
-				if ( ! in_array( $taxonomy_term, $post_terms, true ) ) {
-					return false;
-				}
 			}
 		}
 

@@ -8,7 +8,7 @@ Look no further – WP Default Featured Image is the solution you need.
 
 - Effortlessly set a default thumbnail image for all your posts, pages, or custom post types.
 - Choose or upload any image from your media library.
-- Fine-tune settings based on specific categories and post types.
+- Fine-tune settings based on specific categories, tags and post types.
 
 ## Usage:
 

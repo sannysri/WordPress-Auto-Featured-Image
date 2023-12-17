@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP Default Featured Image
+ * Plugin Name: WP Auto Featured Image
  * Plugin URI: https://github.com/sannysri/WordPress-Default-Featured-Image
  * Description: Set a default featured image effortlessly for your posts, pages, or custom post types using our plugin. Streamline the process by establishing a fallback image based on categories. Choose an image from your media library or upload a new one with ease, ensuring a consistent and efficient way to manage featured images across your content.
  * Version: 1.2

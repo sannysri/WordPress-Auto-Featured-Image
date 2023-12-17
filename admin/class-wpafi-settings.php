@@ -30,9 +30,8 @@ class WPAFI_Settings {
 		add_settings_section( 'wpafi_default_section', 'General Settings', array( $this, 'wpafi_description' ), 'wp_auto_featured_image_options' );
 		add_settings_field( 'wpafi_post_type', 'Post Types:', array( $this, 'wpafi_post_types' ), 'wp_auto_featured_image_options', 'wpafi_default_section' );
 		add_settings_field( 'wpafi_categories', 'Categories:', array( $this, 'wpafi_categories' ), 'wp_auto_featured_image_options', 'wpafi_default_section' );
-		add_settings_field( 'wpafi_taxonomies_terms', 'Terms:', array( $this, 'wpafi_taxonomies_terms' ), 'wp_auto_featured_image_options', 'wpafi_default_section' );
 		add_settings_field( 'wpafi_tags', 'Tags:', array( $this, 'wpafi_tags' ), 'wp_auto_featured_image_options', 'wpafi_default_section' );
-		add_settings_field( 'wpafi_default_thumbnail', 'Default Thumbnail:', array( $this, 'wpafi_default_thumb' ), 'wp_auto_featured_image_options', 'wpafi_default_section' );
+		add_settings_field( 'wpafi_default_thumbnail', 'Default Thumbnail:', array( $this, 'wpafi_default_thumbnail' ), 'wp_auto_featured_image_options', 'wpafi_default_section' );
 	}
 
 	/**
@@ -42,7 +41,7 @@ class WPAFI_Settings {
 		echo '<div class="wpafi-description">';
 		echo '<p>' . esc_html__( 'WP Auto Featured Image allows you to streamline the process of setting featured images effortlessly for your posts, pages, or custom post types. Establish a default fallback image based on categories and ensure a consistent and efficient way to manage featured images across your content.', 'wp-default-featured-image' ) . '</p>';
 		echo '<p>' . esc_html__( 'Please note that the conditions specified below work in conjunction with an AND logical operator. This means that all conditions must be true for the featured image to be set.', 'wp-default-featured-image' ) . '</p>';
-		echo '<p>' . esc_html__( 'The thumbnail will be set when a post is published. For "page" post types, conditions such as category, tags, and terms will be ignored, and the default thumbnail will be applied to all pages upon publishing.', 'wp-default-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'The thumbnail will be set when a post is published. For "page" post types, conditions such as category and tags will be ignored, and the default thumbnail will be applied to all pages upon publishing.', 'wp-default-featured-image' ) . '</p>';
 		echo '</div>';
 	}
 
@@ -56,7 +55,7 @@ class WPAFI_Settings {
 		$sanitized_input = array();
 
 		// List of multi-select fields to sanitize.
-		$multi_select_fields = array( 'wpafi_post_type', 'wpafi_categories', 'wpafi_tags', 'wpafi_taxonomy_terms' );
+		$multi_select_fields = array( 'wpafi_post_type', 'wpafi_categories', 'wpafi_tags' );
 
 		foreach ( $multi_select_fields as $field ) {
 			if ( isset( $input[ $field ] ) && is_array( $input[ $field ] ) ) {
@@ -65,11 +64,11 @@ class WPAFI_Settings {
 		}
 
 		// Sanitize specific fields.
-		$specific_fields = array( 'wpafi_default_thumb' );
+		$specific_fields = array( 'wpafi_default_thumb_id' );
 
 		foreach ( $specific_fields as $field ) {
 			if ( isset( $input[ $field ] ) ) {
-				$sanitized_input['wpafi_default_thumb'] = intval( $input[ $field ] );
+				$sanitized_input['wpafi_default_thumb_id'] = intval( $input[ $field ] );
 			}
 		}
 
@@ -98,7 +97,7 @@ class WPAFI_Settings {
 		foreach ( $post_types as $post_type ) {
 			if ( 'attachment' !== $post_type ) {
 				$selected = '';
-				if ( $options['wpafi_post_type'] ) {
+				if ( ! empty( $options['wpafi_post_type'] ) ) {
 					if ( in_array( $post_type, $options['wpafi_post_type'], true ) ) {
 						$selected = " selected='selected'";
 					}
@@ -124,41 +123,15 @@ class WPAFI_Settings {
 
 		echo '<select class="wpafi-select" id="wpafi-category-multiselect" name="wpafi_options[wpafi_categories][]" multiple="multiple">';
 		foreach ( $wpafi_cats as $wpafi_cat ) {
-			$selected = in_array( $wpafi_cat->slug, $options['wpafi_categories'], true ) ? ' selected="selected"' : '';
+
+			$selected = '';
+			if ( ! empty( $options['wpafi_categories'] ) && is_array( $options['wpafi_categories'] ) ) {
+				$selected = in_array( $wpafi_cat->slug, $options['wpafi_categories'], true ) ? ' selected="selected"' : '';
+			}
 			echo '<option value="' . esc_attr( $wpafi_cat->slug ) . '"' . esc_attr( $selected ) . '>' . esc_attr( $wpafi_cat->name ) . '</option>';
 		}
 		echo '</select>';
 	}
-
-	/**
-	 * Render a multiselect dropdown for taxonomies terms in the plugin settings.
-	 */
-	public function wpafi_taxonomies_terms() {
-		$options = get_option( 'wpafi_options' );
-
-		// Get all public taxonomies excluding "category" and "post_tag".
-		$taxonomies = get_taxonomies( array( 'public' => true ), 'names' );
-
-		// Taxonomies to exclude.
-		$taxonomies_to_exclude = array( 'category', 'post_tag' );
-
-		// Remove specified taxonomies from the array.
-		$taxonomies = array_diff( $taxonomies, $taxonomies_to_exclude );
-
-		echo '<select id="wpafi-taxonomy-multiselect" class="wpafi-select" name="wpafi_options[wpafi_taxonomy_terms][]" multiple="multiple">';
-
-		foreach ( $taxonomies as $taxonomy ) {
-			$terms = get_terms( $taxonomy, array( 'hide_empty' => true ) );
-
-			foreach ( $terms as $term ) {
-				$selected = in_array( $term->slug, $options['wpafi_taxonomy_terms'], true ) ? ' selected="selected"' : '';
-				echo '<option value="' . esc_attr( $term->slug ) . '"' . esc_attr( $selected ) . '>' . esc_attr( $term->name ) . '</option>';
-			}
-		}
-
-		echo '</select>';
-	}
-
 
 	/**
 	 * Render a multiselect dropdown for tags in the plugin settings.
@@ -178,19 +151,21 @@ class WPAFI_Settings {
 	/**
 	 * Renders the HTML for the default thumbnail settings in the admin panel.
 	 */
-	public function wpafi_default_thumb() {
+	public function wpafi_default_thumbnail() {
 		$options = get_option( 'wpafi_options' );
 		?>
 		<div class="upload-container">
-			<input type="hidden" id="default_thumb_id" name="wpafi_options[wpafi_default_thumb]" value="<?php echo esc_attr( $options['wpafi_default_thumb'] ); ?>" />
+			<input type="hidden" id="default_thumb_id" name="wpafi_options[wpafi_default_thumb_id]" value="<?php echo esc_attr( $options['wpafi_default_thumb_id'] ); ?>" />
 			<button id="upload_default_thumb" class="button" type="button"><?php esc_html_e( 'Upload Thumbnail', 'wp-default-featured-image' ); ?></button>
-		<?php if ( ! empty( $options['wpafi_default_thumb'] ) ) : ?>
+		<?php if ( ! empty( $options['wpafi_default_thumb_id'] ) ) : ?>
 				<button id="delete_thumb" name="delete_thumb" class="button" type="button"><?php esc_html_e( 'Delete Thumbnail', 'wp-default-featured-image' ); ?></button>
 		<?php endif; ?>
 			<div id="uploaded_thumb_preview">
 		<?php
-		// Use wp_get_attachment_image to display the image by ID.
-		echo wp_get_attachment_image( $options['wpafi_default_thumb'], 'full', false, array( 'style' => 'max-width:100%;' ) );
+		if ( ! empty( $options['wpafi_default_thumb_id'] ) ) {
+			// Use wp_get_attachment_image to display the image by ID.
+			echo wp_get_attachment_image( $options['wpafi_default_thumb_id'], 'full', false, array( 'style' => 'max-width:100%;' ) );
+		}
 		?>
 			</div>
 		</div>

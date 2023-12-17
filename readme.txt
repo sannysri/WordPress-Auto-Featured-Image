@@ -3,86 +3,92 @@ Contributors: sanny_rss
 Tags: Featured Image, Auto Featured Image, Default Featured Image, Auto, Default, Post Thumbnail, Auto Post Thumbnail, Set Post Thumbnail, Auto Post Thumbnail, WordPress Post Thumbnail
 Donate link: https://sanny.dev/
 Requires at least: 3.5
-Tested up to: 6.2
-Stable tag: 1.5.1
+Tested up to: 6.4.2
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Choose an image from your library and set this for default featured image for page, post and custom post types.
+Set a default featured image effortlessly for your posts, pages, or custom post types using our plugin. Streamline the process by establishing a fallback image based on categories. Choose an image from your media library or upload a new one with ease, ensuring a consistent and efficient way to manage featured images across your content.
 
 == Description ==
-Are you bored of setting deafult featured image every time you publish a page, post or custom post type or you want a default featured image to be auto set as thumbnail whenever  you publish or update your post/page?  
+Are you tired of manually configuring a default featured image each time you publish a page, post, or custom post type? Do you desire a default featured image to automatically serve as a thumbnail whenever you publish or update your post/page?
 
-Here is the solution:
+Look no further!
 
-This plugin provides you an easy way to set a default thumbnail image for all your posts, pages or custom post types. You can choose/upload any image from your media library.
+This plugin provides a convenient solution to set a default thumbnail image effortlessly for all your posts, pages, or custom post types. Select or upload any image from your media library with ease.
 
-You can access this from the WordPress Dashboard under Settings => "WP Default Featured Image" (admin menu)
+Access the settings via the WordPress Dashboard under Settings => "Auto Featured Image" (admin menu).
 
-Quick Setting:
+Quick Setup:
 
-* Select/upload an image from media library.
+* Choose/upload an image from the media library.
 * Specify categories.
-* Specify the post types.
+* Define the post types.
 
-Please note this plugin will set thumbnail whenever a post is being published or modified and no thumbnail is assigned.
+Please note that this plugin automatically assigns a thumbnail when a post is published or modified, but only if the post lacks a featured image.
 
 == Installation ==
-Upload the WordPress Default Featured Image folder to the /wp-content/plugins/ directory.
-
-Activate the plugin using the \'Plugins\' menu in your WordPress admin panel.
-
-You can set default image using your WordPress admin panel in Settings => "WP Default Featured Image".
+1. Upload the WordPress Default Featured Image folder to the /wp-content/plugins/ directory.
+2. Activate the plugin using the 'Plugins' menu in your WordPress admin panel.
+3. Set the default image through your WordPress admin panel in Settings => "WP Default Featured Image".
 
 == Screenshots ==
 1. Settings page for "WordPress Default Featured Image".
-2. Choose an image for default thumbnail.
-3. Featured Image will auto get assigned if a post is being published or updated and it is configired from backend.
+2. Choose an image for the default thumbnail.
+3. Featured Image will automatically get assigned if a post is being published or updated and is configured from the backend.
 
 == Frequently Asked Questions ==
 
-= This plugin will set default thumbnail for all existing post-types/pages? =
+= Will this plugin set a default thumbnail for all existing post-types/pages? =
 
-This wil work for all the post types you have configured from plugin settings, featured image will auto get assigned if a post is being published or updated and it is configired from backend
+Yes, it will work for all the post types you have configured from the plugin settings. The featured image will automatically get assigned if a post is being published or updated and is configured from the backend.
 
-= Can I choose multiple post type for a single default image? =
+= Can I choose multiple post types for a single default image? =
 
 Yes, you can.
 
 = Can I choose different images for different post-types/categories? =
 
-No, right now there is no such feature available but you can hire experts from our team or can request a completely custom plugin as per your need.
+No, currently there is no such feature available, but you can hire experts from our team or request a completely custom plugin as per your needs.
 
 == Changelog ==
+= 1.2 =
+* Compatibility extended up to version 6.4.2.
+* Code refactoring for improved efficiency.
+* Addressed minor bug fixes.
+
 = 1.5 =
-* Compatible upto 4.9.5
-* Minor bug fix 
+* Compatible up to 6.2.3.
+* Minor bug fix.
+
+= 1.5 =
+* Compatible up to 4.9.5.
+* Minor bug fix.
 
 = 1.4 =
-* Compatible upto 4.5.1
-* Fix media popup selector 
+* Compatible up to 4.5.1.
+* Fix media popup selector.
 
 = 1.3 =
-* Bug Fix, WHITE blank screen when choosing image for featured image from plugin panel.
+* Bug Fix: WHITE blank screen when choosing an image for the featured image from the plugin panel.
 
 = 1.2 =
-* Bug Fix [Featured Image Return To Default When making Changes to Content]
-https://wordpress.org/support/topic/when-featured-image-is-selected-it-still-use-the-default-image
+* Bug Fix: Featured Image Return To Default When making Changes to Content.
+  [Support Topic](https://wordpress.org/support/topic/when-featured-image-is-selected-it-still-use-the-default-image)
 
 = 1.1 =
-* Restrict to specific categoriers.
-* Allow Categories for all post types or for POST only.
+* Restrict to specific categories.
+* Allow categories for all post types or for POST only.
 * Menu moved under 'Settings'.
 
 = 1.0 =
 * First release.
 
-
 == Upgrade Notice ==
 
 = 1.1 =
-* Restrict to specific categoriers.
-* Allow Categories for all post types or for POST only.
+* Restrict to specific categories.
+* Allow categories for all post types or for POST only.
 * Menu moved under 'Settings'.
 
 = 1.0 =
