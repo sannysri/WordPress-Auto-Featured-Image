@@ -39,7 +39,11 @@ class WPAFI_Settings {
 	 * Display the description for the General Settings section.
 	 */
 	public function wpafi_description() {
-		echo '<p>' . esc_html__( 'General settings for WP Auto Featured Image.', 'wp-default-featured-image' ) . '</p>';
+		echo '<div class="wpafi-description">';
+		echo '<p>' . esc_html__( 'WP Auto Featured Image allows you to streamline the process of setting featured images effortlessly for your posts, pages, or custom post types. Establish a default fallback image based on categories and ensure a consistent and efficient way to manage featured images across your content.', 'wp-default-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'Please note that the conditions specified below work in conjunction with an AND logical operator. This means that all conditions must be true for the featured image to be set.', 'wp-default-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'The thumbnail will be set when a post is published. For "page" post types, conditions such as category, tags, and terms will be ignored, and the default thumbnail will be applied to all pages upon publishing.', 'wp-default-featured-image' ) . '</p>';
+		echo '</div>';
 	}
 
 	/**
@@ -79,18 +83,18 @@ class WPAFI_Settings {
 	public function wpafi_post_types() {
 		/**
 		 * Options saved in the WordPress database.
-	 *
+		 *
 		 * @var array
 		 */
 		$options = get_option( 'wpafi_options' );
 
 		/**
 		 * Array of public post types.
-	 *
+		 *
 		 * @var array
 		 */
 		$post_types = get_post_types( array( 'public' => true ), 'names' );
-		echo '<select  class="wpafi-select" id="my-multiselect" name="wpafi_options[wpafi_post_type][]" multiple="multiple">';
+		echo '<select  class="wpafi-select" id="wpafi-multiselect" name="wpafi_options[wpafi_post_type][]" multiple="multiple">';
 		foreach ( $post_types as $post_type ) {
 			if ( 'attachment' !== $post_type ) {
 				$selected = '';
@@ -118,7 +122,7 @@ class WPAFI_Settings {
 			)
 		);
 
-		echo '<select class="wpafi-select" id="my-category-multiselect" name="wpafi_options[wpafi_categories][]" multiple="multiple">';
+		echo '<select class="wpafi-select" id="wpafi-category-multiselect" name="wpafi_options[wpafi_categories][]" multiple="multiple">';
 		foreach ( $wpafi_cats as $wpafi_cat ) {
 			$selected = in_array( $wpafi_cat->slug, $options['wpafi_categories'], true ) ? ' selected="selected"' : '';
 			echo '<option value="' . esc_attr( $wpafi_cat->slug ) . '"' . esc_attr( $selected ) . '>' . esc_attr( $wpafi_cat->name ) . '</option>';
@@ -133,21 +137,18 @@ class WPAFI_Settings {
 		$options = get_option( 'wpafi_options' );
 
 		// Get all public taxonomies excluding "category" and "post_tag".
-		$taxonomies = get_taxonomies(
-			array(
-				'public'  => true,
-				'exclude' => array(
-					'category',
-					'post_tag',
-				),
-			),
-			'names'
-		);
+		$taxonomies = get_taxonomies( array( 'public' => true ), 'names' );
 
-		echo '<select id="my-taxonomy-multiselect" class="wpafi-select" name="wpafi_options[wpafi_taxonomy_terms][]" multiple="multiple">';
+		// Taxonomies to exclude.
+		$taxonomies_to_exclude = array( 'category', 'post_tag' );
+
+		// Remove specified taxonomies from the array.
+		$taxonomies = array_diff( $taxonomies, $taxonomies_to_exclude );
+
+		echo '<select id="wpafi-taxonomy-multiselect" class="wpafi-select" name="wpafi_options[wpafi_taxonomy_terms][]" multiple="multiple">';
 
 		foreach ( $taxonomies as $taxonomy ) {
-			$terms = get_terms( $taxonomy, array( 'hide_empty' => false ) );
+			$terms = get_terms( $taxonomy, array( 'hide_empty' => true ) );
 
 			foreach ( $terms as $term ) {
 				$selected = in_array( $term->slug, $options['wpafi_taxonomy_terms'], true ) ? ' selected="selected"' : '';
@@ -166,7 +167,7 @@ class WPAFI_Settings {
 		$options = get_option( 'wpafi_options' );
 		$tags    = get_tags();
 
-		echo '<select id="my-tag-multiselect" class="wpafi-select"  name="wpafi_options[wpafi_tags][]" multiple="multiple">';
+		echo '<select id="wpafi-tag-multiselect" class="wpafi-select"  name="wpafi_options[wpafi_tags][]" multiple="multiple">';
 		foreach ( $tags as $tag ) {
 			$selected = in_array( $tag->slug, $options['wpafi_tags'], true ) ? ' selected="selected"' : '';
 			echo '<option value="' . esc_attr( $tag->slug ) . '"' . esc_attr( $selected ) . '>' . esc_attr( $tag->name ) . '</option>';

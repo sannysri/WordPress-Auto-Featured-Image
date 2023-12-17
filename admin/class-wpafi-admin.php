@@ -18,13 +18,14 @@ class WPAFI_Admin {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'save_post', array( $this, 'wpafi_set_thumbnail' ) );
+		add_action( 'admin_menu', array( $this, 'add_admin_page' ) );
 
+		// Include file to create the settings page.
 		require_once plugin_dir_path( __FILE__ ) . '/class-wpafi-settings.php';
 
-		// Initialize the admin class.
+		// Initialize the settings class.
 		if ( class_exists( 'WPAFI_Settings' ) ) {
 			$wp_auto_featured_image_settings = new WPAFI_Settings();
-			add_action( 'admin_menu', array( $this, 'add_admin_page' ) );
 		}
 	}
 
@@ -93,13 +94,22 @@ class WPAFI_Admin {
 	 *
 	 * @param int $post_id The ID of the post being saved.
 	 */
-	public function wpfi_set_thumbnail( $post_id ) {
+	public function wpafi_set_thumbnail( $post_id ) {
 
 		// Bail, if the post is an autosave.
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
-			return false;
+			return;
 		}
 
+		// Get the post status.
+		$post_status = get_post_status( $post_id );
+
+		// Check if the post is being published.
+		if ( 'publish' !== $post_status ) {
+			return;
+		}
+
+		// Get settings for the plugin.
 		$options = get_option( 'wpafi_options' );
 
 		// Check if wpafi_options settings exist.
@@ -112,8 +122,9 @@ class WPAFI_Admin {
 			return;
 		}
 
+		// Set post thumbnail if post meets all requirements.
 		if ( $this->is_post_meeting_criteria( $post_id, $options ) ) {
-			$this->set_post_thumbnail( $post_id, $options );
+			set_post_thumbnail( $post_id, $options['wpafi_default_thumb'] );
 		}
 	}
 
@@ -126,13 +137,15 @@ class WPAFI_Admin {
 	 * @return bool True if thumbnail should be set, false otherwise.
 	 */
 	public function is_post_meeting_criteria( $post_id, $options ) {
-		if ( empty( $options['wpafi_default_thumb_id'] ) ) {
+		if ( empty( $options['wpafi_default_thumb'] ) ) {
 			return;
 		}
 
+		// Get current post type.
+		$current_post_type = get_post_type( $post_id );
+
 		// Check post type condition.
 		if ( ! empty( $options['wpafi_post_type'] ) && is_array( $options['wpafi_post_type'] ) ) {
-			$current_post_type = get_post_type( $post_id );
 			if ( ! in_array( $current_post_type, $options['wpafi_post_type'], true ) ) {
 				return false;
 			}
@@ -146,17 +159,20 @@ class WPAFI_Admin {
 		}
 
 		// Check taxonomy terms condition.
-		if ( ! empty( $options['wpafi_taxonomy_terms'] ) && is_array( $options['wpafi_taxonomy_terms'] ) ) {
+		if ( 'page' !== $current_post_type && ! empty( $options['wpafi_taxonomy_terms'] ) && is_array( $options['wpafi_taxonomy_terms'] ) ) {
+			// Get all post terms.
+			$post_terms = wp_get_post_terms( $post_id, '', array( 'fields' => 'ids' ) );
+
+			// Check for all post terms.
 			foreach ( $options['wpafi_taxonomy_terms'] as $taxonomy_term ) {
-				$taxonomy = get_term( $taxonomy_term )->taxonomy;
-				if ( ! has_term( $taxonomy_term, $taxonomy, $post_id ) ) {
+				if ( ! in_array( $taxonomy_term, $post_terms, true ) ) {
 					return false;
 				}
 			}
 		}
 
 		// Check tags condition.
-		if ( ! empty( $options['wpafi_tags'] ) && is_array( $options['wpafi_tags'] ) ) {
+		if ( 'page' !== $current_post_type && ! empty( $options['wpafi_tags'] ) && is_array( $options['wpafi_tags'] ) ) {
 			$post_tags = wp_get_post_tags( $post_id, array( 'fields' => 'slugs' ) );
 			if ( empty( array_intersect( $post_tags, $options['wpafi_tags'] ) ) ) {
 				return false;
@@ -167,13 +183,4 @@ class WPAFI_Admin {
 		return true;
 	}
 
-	/**
-	 * Set the post thumbnail based on plugin options.
-	 *
-	 * @param int   $post_id  The ID of the post.
-	 * @param array $options Plugin options.
-	 */
-	public function set_post_thumbnail( $post_id, $options ) {
-		set_post_thumbnail( $post_id, $options['wpafi_default_thumb_id'] );
-	}
 }
