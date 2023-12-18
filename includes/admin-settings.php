@@ -2,7 +2,7 @@
 /**
  * Admin settings file for the WP Auto Featured Image plugin.
  *
- * @package WP_Default_Featured_Image
+ * @package WP_Auto_Featured_Image
  */
 
 ?>
@@ -27,7 +27,7 @@
 						<h3 class="hndle"><span><?php esc_html_e( 'Support', 'wpafi' ); ?></span></h3>
 						<div class="inside">
 							<p class="multi-option"><?php esc_html_e( 'Have you encountered any problems with our plugin and need our help? Do you need to ask us any questions?', 'wpafi' ); ?></p>
-							<p><?php esc_html_e( 'You can post your questions or issues on the WordPress', 'wpafi' ); ?> <a target="_blank" href="http://wordpress.org/support/plugin/wp-auto-featured-image"><?php esc_html_e( 'Support Forum', 'wpafi' ); ?></a><?php esc_html_e( ' or can directly', 'wpafi' ); ?> <a href="mailto:sannysrivastava@gmail.com?subject=<?php esc_html_e( 'Support Request For WordPress Default Featured Image From', 'wpafi' ); ?> <?php bloginfo( 'url' ); ?>"><?php esc_html_e( 'email me', 'wpafi' ); ?></a>.</p>
+							<p><?php esc_html_e( 'You can post your questions or issues on the WordPress', 'wpafi' ); ?> <a target="_blank" href="http://wordpress.org/support/plugin/wp-auto-featured-image"><?php esc_html_e( 'Support Forum', 'wpafi' ); ?></a><?php esc_html_e( ' or can directly', 'wpafi' ); ?> <a href="mailto:sannysrivastava@gmail.com?subject=<?php esc_html_e( 'Support Request For WordPress Auto Featured Image From', 'wpafi' ); ?> <?php bloginfo( 'url' ); ?>"><?php esc_html_e( 'email me', 'wpafi' ); ?></a>.</p>
 						</div>
 					</div>
 				</div>

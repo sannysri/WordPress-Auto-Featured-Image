@@ -2,13 +2,13 @@
 /**
  * WP Auto Featured Image Admin Functions
  *
- * @package WP_Default_Featured_Image
+ * @package WP_Auto_Featured_Image
  */
 
 /**
  * Class WPAFI_Admin
  *
- * @package WP_Default_Featured_Image
+ * @package WP_Auto_Featured_Image
  */
 class WPAFI_Admin {
 	/**

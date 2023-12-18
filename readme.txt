@@ -1,4 +1,4 @@
-=== WordPress Default Featured Image ===
+=== WordPress Auto Featured Image ===
 Contributors: sanny_rss
 Tags: Featured Image, Auto Featured Image, Default Featured Image, Auto, Default, Post Thumbnail, Auto Post Thumbnail, Set Post Thumbnail, Auto Post Thumbnail, WordPress Post Thumbnail
 Donate link: https://sanny.dev/
@@ -28,12 +28,12 @@ Quick Setup:
 Please note that this plugin automatically assigns a thumbnail when a post is published or modified, but only if the post lacks a featured image.
 
 == Installation ==
-1. Upload the WordPress Default Featured Image folder to the /wp-content/plugins/ directory.
+1. Upload the WordPress Auto Featured Image folder to the /wp-content/plugins/ directory.
 2. Activate the plugin using the 'Plugins' menu in your WordPress admin panel.
-3. Set the default image through your WordPress admin panel in Settings => "WP Default Featured Image".
+3. Set the default image through your WordPress admin panel in Settings => "Auto Featured Image".
 
 == Screenshots ==
-1. Settings page for "WordPress Default Featured Image".
+1. Settings page for "WordPress Auto Featured Image".
 2. Choose an image for the default thumbnail.
 3. Featured Image will automatically get assigned if a post is being published or updated and is configured from the backend.
 
