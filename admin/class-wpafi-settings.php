@@ -2,7 +2,7 @@
 /**
  * WP Auto Featured Image Admin Settings
  *
- * @package WP_Default_Featured_Image
+ * @package WP_Auto_Featured_Image
  */
 
 /**
@@ -11,7 +11,7 @@
  * This file contains the admin settings class for the WP Auto Featured Image plugin.
  *
  * @since   2.0
- * @package WP_Default_Featured_Image
+ * @package WP_Auto_Featured_Image
  */
 class WPAFI_Settings {
 

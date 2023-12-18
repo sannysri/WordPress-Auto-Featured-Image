@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Auto Featured Image
- * Plugin URI: https://github.com/sannysri/WordPress-Default-Featured-Image
+ * Plugin URI: https://github.com/sannysri/WordPress-Auto-Featured-Image
  * Description: Set a default featured image effortlessly for your posts, pages, or custom post types using our plugin. Streamline the process by establishing a fallback image based on categories. Choose an image from your media library or upload a new one with ease, ensuring a consistent and efficient way to manage featured images across your content.
  * Version: 2.0
  * Author: Sanny Srivastava
@@ -11,7 +11,7 @@
  * Text Domain: wp-default-featured-image
  * Domain Path: /languages
  *
- * @package WP_Default_Featured_Image
+ * @package WP_Auto_Featured_Image
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
