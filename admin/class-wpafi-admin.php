@@ -55,10 +55,10 @@ class WPAFI_Admin {
 	 */
 	public function enqueue_scripts() {
 		// Enqueue the main plugin stylesheet.
-		wp_enqueue_style( 'wpafi-style', WP_AUTO_FI_URL . '/css/wpafi-style.css', '1.2', true );
+		wp_enqueue_style( 'wpafi-style', WP_AUTO_FI_URL . '/css/wpafi-style.css', '2.0', true );
 
 		// Register and enqueue the main script with dependencies.
-		wp_register_script( 'wpafi-script', WP_AUTO_FI_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox' ), '1.2', true );
+		wp_register_script( 'wpafi-script', WP_AUTO_FI_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox' ), '2.0', true );
 
 		// Check if the current screen is the WP Auto Featured Image settings page.
 		if ( 'settings_page_wp_auto_featured_image' === get_current_screen()->id ) {
