@@ -10,7 +10,7 @@
  *
  * This file contains the admin settings class for the WP Auto Featured Image plugin.
  *
- * @since   1.2
+ * @since   2.0
  * @package WP_Default_Featured_Image
  */
 class WPAFI_Settings {

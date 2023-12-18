@@ -4,7 +4,7 @@ Tags: Featured Image, Auto Featured Image, Default Featured Image, Auto, Default
 Donate link: https://sanny.dev/
 Requires at least: 3.5
 Tested up to: 6.4.2
-Stable tag: 1.2
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,7 +52,7 @@ Yes, you can.
 No, currently there is no such feature available, but you can hire experts from our team or request a completely custom plugin as per your needs.
 
 == Changelog ==
-= 1.2 =
+= 2.0 =
 * Compatibility extended up to version 6.4.2.
 * Code refactoring for improved efficiency.
 * Addressed minor bug fixes.
