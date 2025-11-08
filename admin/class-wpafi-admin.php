@@ -55,14 +55,15 @@ class WPAFI_Admin {
 	 */
 	public function enqueue_scripts() {
 		// Enqueue the main plugin stylesheet.
-		wp_enqueue_style( 'wpafi-style', WP_AUTO_FI_URL . '/css/wpafi-style.css', array(), WP_AUTO_FI_VERSION );
+		wp_enqueue_style( 'wpafi-style', WP_AUTO_FI_URL . '/css/wpafi-style.css', '2.0', true );
 
 		// Register and enqueue the main script with dependencies.
-		wp_register_script( 'wpafi-script', WP_AUTO_FI_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox' ), WP_AUTO_FI_VERSION, true );
+		wp_register_script( 'wpafi-script', WP_AUTO_FI_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox' ), '2.0', true );
 
 		// Check if the current screen is the WP Auto Featured Image settings page.
 		if ( 'settings_page_wp_auto_featured_image' === get_current_screen()->id ) {
 			// Enqueue necessary scripts and styles for media upload.
+			wp_enqueue_script( 'jquery' );
 			wp_enqueue_script( 'media-upload' );
 			wp_enqueue_media();
 
@@ -74,8 +75,8 @@ class WPAFI_Admin {
 				'wpafi-script',
 				'wpafi_vars',
 				array(
-					'upload_button_text' => esc_html__( 'Upload Thumbnail', 'wp-auto-featured-image' ),
-					'delete_button_text' => esc_html__( 'Delete Thumbnail', 'wp-auto-featured-image' ),
+					'upload_button_text' => esc_html__( 'Upload Thumbnail', 'sny-auto-featured-image' ),
+					'delete_button_text' => esc_html__( 'Delete Thumbnail', 'sny-auto-featured-image' ),
 				)
 			);
 
@@ -83,6 +84,7 @@ class WPAFI_Admin {
 			wp_enqueue_style( 'select2-css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
 
 			// Enqueue jQuery and Select2 JS from CDN.
+			wp_enqueue_script( 'jquery' );
 			wp_enqueue_script( 'select2-js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
 		}
 	}
@@ -136,7 +138,7 @@ class WPAFI_Admin {
 	 */
 	public function is_post_meeting_criteria( $post_id, $options ) {
 		if ( empty( $options['wpafi_default_thumb_id'] ) ) {
-			return false;
+			return;
 		}
 
 		// Get current post type.
