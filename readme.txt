@@ -5,7 +5,7 @@ Donate link: https://sanny.dev/
 Requires at least: 3.5
 Tested up to: 6.8.2
 Requires PHP: 5.6
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes, you can.
 No, currently there is no such feature available, but you can hire experts from our team or request a completely custom plugin as per your needs.
 
 == Changelog ==
+= 2.0.2 =
+* Minor updates and improvements.
+
 = 2.0.1 =
 * Fixed readme issues (short description, tags).
 * Updated assets and icons.
