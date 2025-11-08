@@ -31,7 +31,7 @@ jQuery(document).ready(function($) {
         $('#uploaded_thumb_preview').empty();
 
         // Clear the hidden input field value
-        $('#default_thumb_id').val('');
+        $('#default_thumb_id').val('0');
     });
 
 	// Add select2 to dropdowns.

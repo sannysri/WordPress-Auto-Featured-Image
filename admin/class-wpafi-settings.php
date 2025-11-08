@@ -39,9 +39,9 @@ class WPAFI_Settings {
 	 */
 	public function wpafi_description() {
 		echo '<div class="wpafi-description">';
-		echo '<p>' . esc_html__( 'WP Auto Featured Image allows you to streamline the process of setting featured images effortlessly for your posts, pages, or custom post types. Establish a default fallback image based on categories and ensure a consistent and efficient way to manage featured images across your content.', 'wp-default-featured-image' ) . '</p>';
-		echo '<p>' . esc_html__( 'Please note that the conditions specified below work in conjunction with an AND logical operator. This means that all conditions must be true for the featured image to be set.', 'wp-default-featured-image' ) . '</p>';
-		echo '<p>' . esc_html__( 'The thumbnail will be set when a post is published. For "page" post types, conditions such as category and tags will be ignored, and the default thumbnail will be applied to all pages upon publishing.', 'wp-default-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'WP Auto Featured Image allows you to streamline the process of setting featured images effortlessly for your posts, pages, or custom post types. Establish a default fallback image based on categories and ensure a consistent and efficient way to manage featured images across your content.', 'wp-auto-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'Please note that the conditions specified below work in conjunction with an AND logical operator. This means that all conditions must be true for the featured image to be set.', 'wp-auto-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'The thumbnail will be set when a post is published. For "page" post types, conditions such as category and tags will be ignored, and the default thumbnail will be applied to all pages upon publishing.', 'wp-auto-featured-image' ) . '</p>';
 		echo '</div>';
 	}
 
@@ -68,7 +68,14 @@ class WPAFI_Settings {
 
 		foreach ( $specific_fields as $field ) {
 			if ( isset( $input[ $field ] ) ) {
-				$sanitized_input['wpafi_default_thumb_id'] = intval( $input[ $field ] );
+				$value = intval( $input[ $field ] );
+				if ( $value > 0 && wp_attachment_is_image( $value ) ) {
+					$sanitized_input['wpafi_default_thumb_id'] = $value;
+				} else {
+					$sanitized_input['wpafi_default_thumb_id'] = 0;
+				}
+			} else {
+				$sanitized_input['wpafi_default_thumb_id'] = 0;
 			}
 		}
 
@@ -142,7 +149,10 @@ class WPAFI_Settings {
 
 		echo '<select id="wpafi-tag-multiselect" class="wpafi-select"  name="wpafi_options[wpafi_tags][]" multiple="multiple">';
 		foreach ( $tags as $tag ) {
-			$selected = in_array( $tag->slug, $options['wpafi_tags'], true ) ? ' selected="selected"' : '';
+			$selected = '';
+			if ( ! empty( $options['wpafi_tags'] ) && is_array( $options['wpafi_tags'] ) && in_array( $tag->slug, $options['wpafi_tags'], true ) ) {
+				$selected = ' selected="selected"';
+			}
 			echo '<option value="' . esc_attr( $tag->slug ) . '"' . esc_attr( $selected ) . '>' . esc_attr( $tag->name ) . '</option>';
 		}
 		echo '</select>';
@@ -155,10 +165,10 @@ class WPAFI_Settings {
 		$options = get_option( 'wpafi_options' );
 		?>
 		<div class="upload-container">
-			<input type="hidden" id="default_thumb_id" name="wpafi_options[wpafi_default_thumb_id]" value="<?php echo esc_attr( $options['wpafi_default_thumb_id'] ); ?>" />
-			<button id="upload_default_thumb" class="button" type="button"><?php esc_html_e( 'Upload Thumbnail', 'wp-default-featured-image' ); ?></button>
+			<input type="hidden" id="default_thumb_id" name="wpafi_options[wpafi_default_thumb_id]" value="<?php echo esc_attr( isset( $options['wpafi_default_thumb_id'] ) ? $options['wpafi_default_thumb_id'] : 0 ); ?>" />
+			<button id="upload_default_thumb" class="button" type="button"><?php esc_html_e( 'Upload Thumbnail', 'wp-auto-featured-image' ); ?></button>
 		<?php if ( ! empty( $options['wpafi_default_thumb_id'] ) ) : ?>
-				<button id="delete_thumb" name="delete_thumb" class="button" type="button"><?php esc_html_e( 'Delete Thumbnail', 'wp-default-featured-image' ); ?></button>
+				<button id="delete_thumb" name="delete_thumb" class="button" type="button"><?php esc_html_e( 'Delete Thumbnail', 'wp-auto-featured-image' ); ?></button>
 		<?php endif; ?>
 			<div id="uploaded_thumb_preview">
 		<?php
