@@ -1,0 +1,16 @@
+name: Bug Report
+description: Report a bug
+labels: [bug]
+body:
+  - type: input
+    attributes:
+      label: WordPress Version
+  - type: input
+    attributes:
+      label: PHP Version
+  - type: textarea
+    attributes:
+      label: Describe the bug
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
