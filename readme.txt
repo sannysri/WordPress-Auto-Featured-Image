@@ -3,11 +3,11 @@ Contributors: sanny_rss
 Tags: featured image, auto featured image, post thumbnail, fallback image
 Donate link: https://sanny.dev/
 Requires at least: 3.5
-Tested up to: 6.8.3
+Tested up to: 6.8.2
 Requires PHP: 5.6
 Stable tag: 2.0.1
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Automatically set a default featured image for posts, pages, or custom post types when none is assigned.
 
@@ -54,13 +54,9 @@ No, currently there is no such feature available, but you can hire experts from 
 
 == Changelog ==
 = 2.0.1 =
-* Updated version and compatibility to WordPress 6.8.3.
-* Fixed deprecated WP_PLUGIN_URL constant usage.
-* Standardized text domain to 'wp-auto-featured-image'.
-* Improved settings validation and sanitization.
-* Updated license URI to HTTPS.
-* Fixed logic errors in criteria checking.
-* Enhanced security with proper escaping.
+* Fixed readme issues (short description, tags).
+* Updated assets and icons.
+* Stable tag updated.
 
 = 2.0 =
 * Compatibility extended up to version 6.4.2.
