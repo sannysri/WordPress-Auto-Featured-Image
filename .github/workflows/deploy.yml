@@ -1,9 +1,4 @@
 # Deploy to WordPress.org SVN on version tag push
-# 
-# Required Secrets (Settings → Secrets → Actions):
-#   - SVN_USERNAME: Your WordPress.org username
-#   - SVN_PASSWORD: Your WordPress.org password
-
 name: Deploy to WordPress.org
 
 on:
@@ -23,7 +18,7 @@ jobs:
       - name: WordPress Plugin Deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
         env:
-          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SVN_USERNAME: ${{ secrets.WP_ORG_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WP_ORG_PASSWORD }}
           SLUG: wp-auto-featured-image
           ASSETS_DIR: assets
