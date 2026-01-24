@@ -1,0 +1,52 @@
+# Continuous Integration - runs on every push and PR
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # PHP Syntax Check across multiple versions
+  lint:
+    name: PHP Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      
+      - name: Check PHP syntax
+        run: find . -name "*.php" -not -path "./vendor/*" -print0 | xargs -0 -n1 php -l
+
+  # WordPress Coding Standards
+  phpcs:
+    name: WordPress Coding Standards
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: cs2pr
+      
+      - name: Install PHPCS and WordPress standards
+        run: |
+          composer global require squizlabs/php_codesniffer
+          composer global require wp-coding-standards/wpcs
+          ~/.composer/vendor/bin/phpcs --config-set installed_paths ~/.composer/vendor/wp-coding-standards/wpcs
+      
+      - name: Run PHPCS
+        run: ~/.composer/vendor/bin/phpcs --standard=WordPress --extensions=php --ignore=vendor . --report=checkstyle | cs2pr
+        continue-on-error: true
