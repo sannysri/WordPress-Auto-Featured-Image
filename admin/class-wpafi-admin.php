@@ -650,7 +650,7 @@ class WPAFI_Admin {
 	 */
 	public function is_post_meeting_criteria( $post_id, $options ) {
 		if ( empty( $options['wpafi_default_thumb_id'] ) ) {
-			return;
+			return false;
 		}
 
 		// Get current post type.

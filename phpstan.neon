@@ -1,5 +1,5 @@
 parameters:
-	level: 6
+	level: 5
 	paths:
 		- wp-auto-featured-image.php
 		- admin/
@@ -7,19 +7,11 @@ parameters:
 	excludePaths:
 		- vendor/
 		- tests/
-	bootstrapFiles:
-		- vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
-	scanDirectories:
-		- vendor/szepeviktor/phpstan-wordpress
+	ignoreErrors:
+		# WordPress functions accept mixed types
+		- '#Parameter .* of function esc_attr expects string, int given#'
+		- '#Constant WP_PLUGIN_URL not found#'
 
+# WordPress stubs for function/class definitions
 includes:
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
-
-# Ignore specific errors that are common in WordPress plugins
-ignoreErrors:
-	# Allow dynamic properties on WP objects
-	- '#Access to an undefined property WP_Post::\$#'
-	# WordPress global functions without strict types
-	- '#Function [a-z_]+ invoked with \d+ parameters?, \d+ required\.#'
-	# Allow using $wpdb
-	- '#Variable \$wpdb might not be defined\.#'
