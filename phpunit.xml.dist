@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	>
+	<testsuites>
+		<testsuite name="unit">
+			<directory suffix="Test.php">./tests/Unit</directory>
+		</testsuite>
+		<testsuite name="integration">
+			<directory suffix="Test.php">./tests/Integration</directory>
+		</testsuite>
+	</testsuites>
+
+	<coverage processUncoveredFiles="false">
+		<include>
+			<directory suffix=".php">./admin</directory>
+			<directory suffix=".php">./includes</directory>
+			<file>./wp-auto-featured-image.php</file>
+		</include>
+		<exclude>
+			<directory>./vendor</directory>
+			<directory>./tests</directory>
+		</exclude>
+		<report>
+			<html outputDirectory="coverage"/>
+			<text outputFile="php://stdout"/>
+			<clover outputFile="coverage/clover.xml"/>
+		</report>
+	</coverage>
+
+	<php>
+		<const name="WPAFI_TESTING" value="true"/>
+		<const name="ABSPATH" value="/tmp/wordpress/"/>
+	</php>
+</phpunit>

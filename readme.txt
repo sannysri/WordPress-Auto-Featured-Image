@@ -1,21 +1,21 @@
-=== SNY Auto Featured Image ===
+=== Auto Featured Image by Sanny ===
 Contributors: sanny_rss
-Tags: featured image, default featured image, thumbnails, automatic, custom post type
-Donate link: https://sanny.dev/?utm_source=wordpress_org&utm_medium=plugin&utm_campaign=sny-auto-featured-image&utm_content=donate
-Requires at least: 3.5
+Tags: auto featured image, featured image, default image, thumbnail, automatic
+Donate link: https://sanny.dev/?utm_source=wordpress_org&utm_medium=plugin&utm_campaign=auto-featured-image&utm_content=donate
+Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Automatically set a default featured image for posts, pages, or custom post types when none is assigned.
+Auto-set featured images from content, external URLs, or category defaults. Bulk fix existing posts. Works with any post type.
 
 == Description ==
 
-**Automatically set a default featured image** for your WordPress posts, pages, and custom post types. Save time and ensure every piece of content has a professional thumbnail!
+**Automatically set featured images** for your WordPress posts, pages, and custom post types. Extract from content, use external URLs, set category defaults, or bulk-fix existing posts.
 
-#### Why Choose SNY Auto Featured Image?
+#### Why Choose Auto Featured Image by Sanny?
 
 Never publish a post without a featured image again. This lightweight plugin automatically assigns your chosen default image whenever you publish or update content that lacks a featured image.
 
@@ -31,7 +31,7 @@ Never publish a post without a featured image again. This lightweight plugin aut
 
 #### Quick Setup
 
-1. Go to **Settings > SNY Auto Featured Image**
+1. Go to **Settings > Auto Featured Image**
 2. Choose or upload an image from the media library
 3. Select your post types and categories
 4. Done! New posts will automatically get your default image
@@ -54,14 +54,14 @@ Found a bug or have a feature request? [Open an issue on GitHub](https://github.
 Check out our other WordPress plugins at [sanny.dev/plugins](https://sanny.dev/plugins/?utm_source=wordpress_org&utm_medium=plugin&utm_campaign=sny-auto-featured-image&utm_content=more_plugins).
 
 == Installation ==
-1. Upload the SNY Auto Featured Image folder to the /wp-content/plugins/ directory.
+1. Upload the plugin folder to the /wp-content/plugins/ directory.
 2. Activate the plugin using the 'Plugins' menu in your WordPress admin panel.
-3. Set the default image through your WordPress admin panel in Settings => "SNY Auto Featured Image".
+3. Set the default image through your WordPress admin panel in Settings => "Auto Featured Image".
 
 == Screenshots ==
-1. Settings page for "SNY Auto Featured Image".
+1. Settings page for "Auto Featured Image by Sanny".
 2. Choose an image for the default thumbnail.
-3. Featured Image will automatically get assigned if a post is being published or updated and is configured from the backend.
+3. Featured Image will automatically get assigned if a post is being published or updated.
 
 == Frequently Asked Questions ==
 

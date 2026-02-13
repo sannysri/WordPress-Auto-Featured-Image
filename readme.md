@@ -60,9 +60,46 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 ### Development Setup
 
 ```bash
-git clone https://github.com/sannysri/WordPress-Auto-Featured-Image.git
+# Clone the repository
+git clone https://github.com/developer/WordPress-Auto-Featured-Image.git
 cd WordPress-Auto-Featured-Image
+
+# Install dependencies
+composer install
+
+# Run all checks (lint + tests)
+composer ci
 ```
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `composer test` | Run PHPUnit tests |
+| `composer test:coverage` | Run tests with HTML coverage report |
+| `composer phpcs` | Check WordPress Coding Standards |
+| `composer phpcbf` | Auto-fix coding standard violations |
+| `composer phpstan` | Run static analysis |
+| `composer lint` | Run PHPCS + PHPStan |
+| `composer ci` | Run all checks (lint + test) |
+
+### Code Quality Standards
+
+This plugin follows:
+- **WordPress Coding Standards** (WPCS 3.0)
+- **PHPStan Level 6** for static analysis
+- **PHP 7.4+** compatibility
+- **100% test coverage goal** for core functionality
+
+### CI/CD Pipeline
+
+Every pull request runs:
+- ✅ PHP syntax check (7.4, 8.0, 8.1, 8.2, 8.3)
+- ✅ WordPress Coding Standards (PHPCS)
+- ✅ PHPStan static analysis
+- ✅ PHPUnit tests with coverage
+
+Releases are automatically deployed to WordPress.org via GitHub Actions when you create a new tag.
 
 ## Support
 

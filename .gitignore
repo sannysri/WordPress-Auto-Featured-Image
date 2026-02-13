@@ -22,11 +22,19 @@ Thumbs.db
 
 # Ignore configuration files
 # *.yml  # Removed to allow GitHub Actions
-*.json
+# *.json  # Removed to allow composer.json
 
 # Ignore Composer files
 composer.phar
+composer.lock
 /vendor/
+
+# Ignore NPM files
+package-lock.json
+
+# Ignore test coverage
+/coverage/
+.phpunit.result.cache
 
 # Ignore local development files
 *.sql

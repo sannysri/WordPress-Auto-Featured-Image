@@ -1,0 +1,40 @@
+{
+	"name": "auto-featured-image",
+	"version": "2.1.0",
+	"description": "Automatically set featured images for WordPress posts",
+	"scripts": {
+		"lint:js": "eslint js/*.js --fix",
+		"lint:css": "stylelint css/*.css --fix",
+		"lint": "npm run lint:js && npm run lint:css",
+		"syntax:php": "find . -name '*.php' -not -path './vendor/*' -not -path './tests/*' -print0 | xargs -0 -n1 php -l"
+	},
+	"devDependencies": {
+		"@wordpress/eslint-plugin": "^21.0.0",
+		"eslint": "^8.57.0",
+		"stylelint": "^16.2.0",
+		"stylelint-config-wordpress": "^17.0.0"
+	},
+	"eslintConfig": {
+		"extends": [
+			"plugin:@wordpress/eslint-plugin/recommended"
+		],
+		"env": {
+			"browser": true,
+			"jquery": true
+		},
+		"globals": {
+			"wp": "readonly",
+			"wpafi_vars": "readonly"
+		},
+		"rules": {
+			"no-console": "warn",
+			"no-alert": "off"
+		}
+	},
+	"stylelint": {
+		"extends": "stylelint-config-wordpress",
+		"rules": {
+			"no-descending-specificity": null
+		}
+	}
+}
