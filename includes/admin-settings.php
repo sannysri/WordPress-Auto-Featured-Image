@@ -118,7 +118,7 @@ $post_statuses    = array(
 								printf( esc_html__( '%1$d of %2$d rules used', 'sny-auto-featured-image' ), (int) $rule_count, (int) $max_rules );
 								?>
 							</span>
-							<?php if ( $show_pro_teasers ) : ?>
+								<?php if ( $show_pro_teasers ) : ?>
 							<span class="wpafi-rule-limit-upgrade">
 								— <a href="<?php echo esc_url( wpafi_get_upgrade_url( 'add-btn' ) ); ?>"
 									target="_blank"><?php esc_html_e( 'Upgrade to add more', 'sny-auto-featured-image' ); ?></a>
