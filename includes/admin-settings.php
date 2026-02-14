@@ -139,6 +139,65 @@ $post_statuses = array(
 						</button>
 					</div>
 
+					<!-- Pro Features Showcase -->
+					<?php if ( ! $has_pro ) : ?>
+					<div class="wpafi-pro-showcase">
+						<div class="wpafi-pro-showcase-header">
+							<span class="dashicons dashicons-superhero"></span>
+							<h3><?php esc_html_e( 'Unlock More with Pro', 'sny-auto-featured-image' ); ?></h3>
+						</div>
+						<div class="wpafi-pro-showcase-grid">
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-infinity"></span>
+								<h4><?php esc_html_e( 'Unlimited Rules', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Create as many conditional rules as you need', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-format-image"></span>
+								<h4><?php esc_html_e( 'AI Image Generation', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'DALL-E & Stable Diffusion integration', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-camera"></span>
+								<h4><?php esc_html_e( 'Stock Photo Search', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Search Unsplash & Pexels directly', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-filter"></span>
+								<h4><?php esc_html_e( 'Advanced Filters', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Author, date range, ACF fields, custom taxonomy', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-controls-repeat"></span>
+								<h4><?php esc_html_e( 'Smart Overwrite', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Only replace if larger, or default image', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-undo"></span>
+								<h4><?php esc_html_e( 'Undo & Dry Run', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Preview changes before applying', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-admin-tools"></span>
+								<h4><?php esc_html_e( 'Rule Management', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Import/export, presets, scheduling', 'sny-auto-featured-image' ); ?></p>
+							</div>
+							<div class="wpafi-pro-showcase-item">
+								<span class="dashicons dashicons-cart"></span>
+								<h4><?php esc_html_e( 'WooCommerce', 'sny-auto-featured-image' ); ?></h4>
+								<p><?php esc_html_e( 'Product gallery & variation images', 'sny-auto-featured-image' ); ?></p>
+							</div>
+						</div>
+						<div class="wpafi-pro-showcase-cta">
+							<a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=rules-footer&utm_campaign=upsell"
+								class="button button-primary button-hero" target="_blank">
+								<span class="dashicons dashicons-unlock"></span>
+								<?php esc_html_e( 'Upgrade to Pro', 'sny-auto-featured-image' ); ?>
+							</a>
+						</div>
+					</div>
+					<?php endif; ?>
+
 				</div><!-- End Tab: Image Rules -->
 
 				<!-- Tab: Bulk Operations -->
@@ -197,6 +256,25 @@ $post_statuses = array(
 								</button>
 								<span class="spinner" id="wpafi-bulk-spinner"></span>
 							</div>
+
+							<!-- Pro Feature Teasers -->
+							<?php if ( ! $has_pro ) : ?>
+							<div class="wpafi-pro-teasers">
+								<label class="wpafi-checkbox wpafi-pro-locked">
+									<input type="checkbox" disabled />
+									<span><?php esc_html_e( 'Dry run mode (preview changes without applying)', 'sny-auto-featured-image' ); ?></span>
+									<span class="wpafi-pro-badge"><?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?></span>
+								</label>
+								<div class="wpafi-pro-locked-row">
+									<button type="button" class="button" disabled>
+										<span class="dashicons dashicons-undo"></span>
+										<?php esc_html_e( 'Undo Last Operation', 'sny-auto-featured-image' ); ?>
+									</button>
+									<span class="wpafi-pro-badge"><?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?></span>
+								</div>
+							</div>
+							<?php endif; ?>
+
 							<div id="wpafi-bulk-result"></div>
 						</div>
 					</div>
@@ -266,7 +344,6 @@ $post_statuses = array(
 							</div>
 						</div>
 						<!-- End Section: Display Options -->
-
 						<!-- Save Button for Settings -->
 						<div class="wpafi-save-btn">
 							<button type="submit" class="button button-primary button-hero">
@@ -287,25 +364,30 @@ $post_statuses = array(
 				<div class="wpafi-card-header">
 					<h2>
 						<span class="dashicons dashicons-star-filled"></span>
-						<?php esc_html_e( 'Go Pro', 'sny-auto-featured-image' ); ?>
+						<?php esc_html_e( 'Upgrade to Pro', 'sny-auto-featured-image' ); ?>
 					</h2>
 				</div>
 				<div class="wpafi-card-body">
 					<ul class="wpafi-pro-features">
 						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Unlimited image rules', 'sny-auto-featured-image' ); ?></li>
+							<?php esc_html_e( 'Unlimited conditional rules', 'sny-auto-featured-image' ); ?></li>
 						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'AI image generation', 'sny-auto-featured-image' ); ?></li>
+							<?php esc_html_e( 'AI image generation (DALL-E)', 'sny-auto-featured-image' ); ?></li>
 						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'External URL support', 'sny-auto-featured-image' ); ?></li>
+							<?php esc_html_e( 'Stock photo search', 'sny-auto-featured-image' ); ?></li>
 						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Schedule images', 'sny-auto-featured-image' ); ?></li>
+							<?php esc_html_e( 'Advanced filters (ACF, author)', 'sny-auto-featured-image' ); ?></li>
 						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Priority support', 'sny-auto-featured-image' ); ?></li>
+							<?php esc_html_e( 'Dry run & undo operations', 'sny-auto-featured-image' ); ?></li>
+						<li><span class="dashicons dashicons-yes"></span>
+							<?php esc_html_e( 'Rule import/export', 'sny-auto-featured-image' ); ?></li>
+						<li><span class="dashicons dashicons-yes"></span>
+							<?php esc_html_e( 'Priority email support', 'sny-auto-featured-image' ); ?></li>
 					</ul>
+
 					<a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=sidebar&utm_campaign=upsell"
 						class="button button-primary wpafi-pro-cta" target="_blank">
-						<?php esc_html_e( 'Get Pro Version', 'sny-auto-featured-image' ); ?>
+						<?php esc_html_e( 'Get Pro Now', 'sny-auto-featured-image' ); ?>
 					</a>
 				</div>
 			</div>
