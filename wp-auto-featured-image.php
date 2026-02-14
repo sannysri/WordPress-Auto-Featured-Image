@@ -50,6 +50,8 @@ function wpafi_has_pro_features() {
 
 // Include necessary files.
 require_once plugin_dir_path( __FILE__ ) . 'admin/class-wpafi-admin.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-wpafi-pro-registry.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/wpafi-pro-registry-functions.php';
 
 // Initialize the admin class.
 if ( class_exists( 'WPAFI_Admin' ) ) {

@@ -155,6 +155,10 @@ class WPAFI_Admin {
 				}
 			}
 
+			// Check if Pro teasers should be shown.
+			$show_pro_teasers = ! $has_pro_features && function_exists( 'wpafi_should_show_pro_teasers' ) && wpafi_should_show_pro_teasers();
+			$upgrade_url      = function_exists( 'wpafi_get_upgrade_url' ) ? wpafi_get_upgrade_url( 'add-btn' ) : 'https://sanny.dev/plugins/auto-featured-image-pro/';
+
 			// Localize the script to pass data to JavaScript.
 			wp_localize_script(
 				'wpafi-script',
@@ -171,6 +175,9 @@ class WPAFI_Admin {
 					'select_image_title' => esc_html__( 'Select Featured Image', 'sny-auto-featured-image' ),
 					'categories'         => $categories_arr,
 					'post_types'         => $post_types_arr,
+					'show_pro_teasers'   => $show_pro_teasers,
+					'upgrade_url'        => esc_url( $upgrade_url ),
+					'upgrade_text'       => esc_html__( 'Upgrade to add more', 'sny-auto-featured-image' ),
 				)
 			);
 

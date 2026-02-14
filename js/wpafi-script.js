@@ -374,9 +374,17 @@ jQuery(document).ready(function ($) {
 		const $limitElement = $container.find('.wpafi-rule-limit');
 
 		if (currentRuleCount >= maxRules) {
-			// At limit - show locked state with upgrade link.
+			// At limit - show locked state with upgrade link (only if Pro teasers enabled).
 			if (!$limitElement.hasClass('wpafi-rule-limit-locked')) {
 				$limitElement.addClass('wpafi-rule-limit-locked');
+				var upgradeHtml =
+					wpafi_vars.show_pro_teasers
+						? '<span class="wpafi-rule-limit-upgrade">— <a href="' +
+								wpafi_vars.upgrade_url +
+								'" target="_blank">' +
+								wpafi_vars.upgrade_text +
+								'</a></span>'
+						: '';
 				$limitElement.html(
 					'<span class="dashicons dashicons-lock"></span>' +
 						'<span>' +
@@ -384,9 +392,7 @@ jQuery(document).ready(function ($) {
 						' of ' +
 						maxRules +
 						' rules used</span>' +
-						'<span class="wpafi-rule-limit-upgrade">' +
-						'— <a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=add-btn&utm_campaign=upsell" target="_blank">Upgrade to add more</a>' +
-						'</span>'
+						upgradeHtml
 				);
 			}
 			$container.addClass('wpafi-add-rule-locked');

@@ -10,15 +10,16 @@
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template variables are local scope.
 
-$options       = get_option( 'wpafi_options' );
-$rules         = isset( $options['wpafi_rules'] ) ? $options['wpafi_rules'] : array();
-$is_pro_active = function_exists( 'wpafi_is_pro_active' ) && wpafi_is_pro_active();
-$has_pro       = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
-$max_rules     = $has_pro ? 999 : 2;
-$categories    = get_categories( array( 'hide_empty' => false ) );
-$tags          = get_tags( array( 'hide_empty' => false ) );
-$post_types    = get_post_types( array( 'public' => true ), 'objects' );
-$post_statuses = array(
+$options          = get_option( 'wpafi_options' );
+$rules            = isset( $options['wpafi_rules'] ) ? $options['wpafi_rules'] : array();
+$is_pro_active    = function_exists( 'wpafi_is_pro_active' ) && wpafi_is_pro_active();
+$has_pro          = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
+$show_pro_teasers = ! $has_pro && function_exists( 'wpafi_should_show_pro_teasers' ) && wpafi_should_show_pro_teasers();
+$max_rules        = $has_pro ? 999 : 2;
+$categories       = get_categories( array( 'hide_empty' => false ) );
+$tags             = get_tags( array( 'hide_empty' => false ) );
+$post_types       = get_post_types( array( 'public' => true ), 'objects' );
+$post_statuses    = array(
 	'publish' => __( 'Published', 'sny-auto-featured-image' ),
 	'draft'   => __( 'Draft', 'sny-auto-featured-image' ),
 	'pending' => __( 'Pending', 'sny-auto-featured-image' ),
@@ -41,8 +42,8 @@ $post_statuses = array(
 			<span
 				class="wpafi-version">v<?php echo esc_html( defined( 'WPAFI_VERSION' ) ? WPAFI_VERSION : '2.1.0' ); ?></span>
 		</div>
-		<?php if ( ! $is_pro_active ) : ?>
-		<a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=header&utm_campaign=upsell"
+		<?php if ( $show_pro_teasers ) : ?>
+		<a href="<?php echo esc_url( wpafi_get_upgrade_url( 'header' ) ); ?>"
 			class="wpafi-upgrade-btn" target="_blank">
 			<span class="dashicons dashicons-star-filled"></span>
 			<?php esc_html_e( 'Upgrade to Pro', 'sny-auto-featured-image' ); ?>
@@ -117,10 +118,12 @@ $post_statuses = array(
 								printf( esc_html__( '%1$d of %2$d rules used', 'sny-auto-featured-image' ), (int) $rule_count, (int) $max_rules );
 								?>
 							</span>
+							<?php if ( $show_pro_teasers ) : ?>
 							<span class="wpafi-rule-limit-upgrade">
-								— <a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=add-btn&utm_campaign=upsell"
+								— <a href="<?php echo esc_url( wpafi_get_upgrade_url( 'add-btn' ) ); ?>"
 									target="_blank"><?php esc_html_e( 'Upgrade to add more', 'sny-auto-featured-image' ); ?></a>
 							</span>
+							<?php endif; ?>
 							<?php else : ?>
 								<?php
 								/* translators: 1: Current rule count, 2: Maximum rules allowed. */
@@ -140,7 +143,7 @@ $post_statuses = array(
 					</div>
 
 					<!-- Pro Features Showcase -->
-					<?php if ( ! $has_pro ) : ?>
+					<?php if ( $show_pro_teasers ) : ?>
 					<div class="wpafi-pro-showcase">
 						<div class="wpafi-pro-showcase-header">
 							<span class="dashicons dashicons-superhero"></span>
@@ -189,7 +192,7 @@ $post_statuses = array(
 							</div>
 						</div>
 						<div class="wpafi-pro-showcase-cta">
-							<a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=rules-footer&utm_campaign=upsell"
+							<a href="<?php echo esc_url( wpafi_get_upgrade_url( 'rules-footer' ) ); ?>"
 								class="button button-primary button-hero" target="_blank">
 								<span class="dashicons dashicons-unlock"></span>
 								<?php esc_html_e( 'Upgrade to Pro', 'sny-auto-featured-image' ); ?>
@@ -258,7 +261,7 @@ $post_statuses = array(
 							</div>
 
 							<!-- Pro Feature Teasers -->
-							<?php if ( ! $has_pro ) : ?>
+							<?php if ( $show_pro_teasers ) : ?>
 							<div class="wpafi-pro-teasers">
 								<label class="wpafi-checkbox wpafi-pro-locked">
 									<input type="checkbox" disabled />
@@ -359,7 +362,7 @@ $post_statuses = array(
 
 		<!-- Sidebar -->
 		<aside class="wpafi-sidebar">
-			<?php if ( ! $is_pro_active ) : ?>
+			<?php if ( $show_pro_teasers ) : ?>
 			<div class="wpafi-card wpafi-pro-card">
 				<div class="wpafi-card-header">
 					<h2>
@@ -368,24 +371,22 @@ $post_statuses = array(
 					</h2>
 				</div>
 				<div class="wpafi-card-body">
+					<?php
+					$pro_features = wpafi_get_pro_features();
+					$price_text   = wpafi_get_pro_price_text();
+					?>
 					<ul class="wpafi-pro-features">
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Unlimited conditional rules', 'sny-auto-featured-image' ); ?></li>
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'AI image generation (DALL-E)', 'sny-auto-featured-image' ); ?></li>
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Stock photo search', 'sny-auto-featured-image' ); ?></li>
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Advanced filters (ACF, author)', 'sny-auto-featured-image' ); ?></li>
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Dry run & undo operations', 'sny-auto-featured-image' ); ?></li>
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Rule import/export', 'sny-auto-featured-image' ); ?></li>
-						<li><span class="dashicons dashicons-yes"></span>
-							<?php esc_html_e( 'Priority email support', 'sny-auto-featured-image' ); ?></li>
+						<?php foreach ( $pro_features as $feature ) : ?>
+						<li>
+							<span class="dashicons <?php echo esc_attr( ! empty( $feature['icon'] ) ? $feature['icon'] : 'dashicons-yes' ); ?>"></span>
+							<?php echo esc_html( $feature['title'] ); ?>
+						</li>
+						<?php endforeach; ?>
 					</ul>
-
-					<a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=sidebar&utm_campaign=upsell"
+					<?php if ( ! empty( $price_text ) ) : ?>
+					<p class="wpafi-pro-price"><?php echo esc_html( $price_text ); ?></p>
+					<?php endif; ?>
+					<a href="<?php echo esc_url( wpafi_get_upgrade_url( 'sidebar' ) ); ?>"
 						class="button button-primary wpafi-pro-cta" target="_blank">
 						<?php esc_html_e( 'Get Pro Now', 'sny-auto-featured-image' ); ?>
 					</a>
