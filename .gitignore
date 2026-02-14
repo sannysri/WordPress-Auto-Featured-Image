@@ -30,7 +30,6 @@ composer.lock
 /vendor/
 
 # Ignore NPM files
-package-lock.json
 
 # Ignore test coverage
 /coverage/

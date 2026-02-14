@@ -70,7 +70,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run PHPCS
-        run: composer phpcs -- -n --report=checkstyle | cs2pr
+        run: composer phpcs -- -q -n --report=checkstyle | cs2pr
 
   # Static Analysis with PHPStan
   phpstan:
