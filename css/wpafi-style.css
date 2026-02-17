@@ -20,13 +20,23 @@
 	--wpafi-border: #c3c4c7;
 	--wpafi-border-light: #e0e0e0;
 	--wpafi-bg: #f0f0f1;
+	--wpafi-bg-light: #f8f9fa;
 	--wpafi-card-bg: #fff;
 	--wpafi-text: #1e1e1e;
 	--wpafi-text-secondary: #757575;
 	--wpafi-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	--wpafi-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+	--wpafi-shadow-pro: 0 4px 15px rgba(155, 123, 192, 0.4);
 	--wpafi-radius: 8px;
-	--wpafi-pro-color: #764ba2;
+	--wpafi-radius-sm: 4px;
+	--wpafi-pro-color: #9b7bc0;
+	--wpafi-pro-gradient: linear-gradient(135deg, #9b7bc0 0%, #7c5ba0 100%);
+
+	/* Button tokens */
+	--wpafi-btn-transition: all 0.2s ease;
+	--wpafi-btn-hover-lift: translateY(-2px);
+	--wpafi-btn-shadow: 0 2px 6px rgba(155, 123, 192, 0.3);
+	--wpafi-btn-shadow-hover: 0 4px 12px rgba(155, 123, 192, 0.4);
 }
 
 /* ==========================================================================
@@ -42,11 +52,100 @@
 }
 
 /* Hide WordPress default notices - we use custom toast notifications */
-.wpafi-settings-wrap .notice,
+.wpafi-settings-wrap .notice:not(.wpafi-review-notice),
 .wpafi-settings-wrap .updated,
 .wpafi-settings-wrap .error,
 .wpafi-settings-wrap .settings-error {
 	display: none !important;
+}
+
+/* ==========================================================================
+   Review Notice
+   ========================================================================== */
+
+.wpafi-review-notice {
+	display: block !important;
+	border-left-color: var(--wpafi-primary);
+	padding: 12px 16px;
+	margin: 15px 0;
+}
+
+.wpafi-review-content {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+}
+
+.wpafi-review-icon {
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	background: var(--wpafi-pro-gradient);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wpafi-review-icon .dashicons {
+	color: #fff;
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+}
+
+.wpafi-review-text {
+	flex: 1;
+}
+
+.wpafi-review-text p {
+	margin: 0 0 8px 0;
+}
+
+.wpafi-review-text p:last-of-type:not(.wpafi-review-actions) {
+	margin-bottom: 12px;
+}
+
+.wpafi-review-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin-top: 12px;
+}
+
+.wpafi-review-actions .button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.wpafi-review-actions .button .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 1;
+}
+
+.wpafi-review-actions .button-primary {
+	background: var(--wpafi-primary);
+	border-color: var(--wpafi-primary);
+}
+
+.wpafi-review-actions .button-primary:hover {
+	background: var(--wpafi-primary-hover);
+	border-color: var(--wpafi-primary-hover);
+}
+
+.wpafi-review-dismiss-link {
+	color: var(--wpafi-text-secondary);
+	text-decoration: none;
+	font-size: 13px;
+}
+
+.wpafi-review-dismiss-link:hover {
+	color: var(--wpafi-text);
+	text-decoration: underline;
 }
 
 .wpafi-settings-wrap {
@@ -101,18 +200,22 @@
 	margin: 0;
 	font-size: 24px;
 	font-weight: 600;
+	padding: 0;
 	color: var(--wpafi-text);
 }
 
 .wpafi-logo {
 	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	line-height: 1;
 	color: var(--wpafi-primary);
 }
 
 .wpafi-version {
 	padding: 4px 10px;
 	background: var(--wpafi-bg);
-	border-radius: 4px;
+	border-radius: var(--wpafi-radius-sm);
 	font-size: 12px;
 	color: var(--wpafi-text-secondary);
 }
@@ -149,7 +252,8 @@
 
 .wpafi-tab-btn:hover {
 	color: var(--wpafi-primary);
-	background: var(--wpafi-bg);
+	background: transparent;
+	border-bottom-color: var(--wpafi-border);
 }
 
 .wpafi-tab-btn.active {
@@ -177,18 +281,19 @@
 	align-items: center;
 	gap: 6px;
 	padding: 10px 20px;
-	background: var(--wpafi-pro-color);
+	background: var(--wpafi-pro-gradient);
 	color: #fff;
 	text-decoration: none;
 	border-radius: var(--wpafi-radius);
 	font-weight: 600;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition: var(--wpafi-btn-transition);
+	box-shadow: var(--wpafi-btn-shadow);
 }
 
 .wpafi-upgrade-btn:hover {
 	color: #fff;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(118, 75, 162, 0.4);
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: var(--wpafi-btn-shadow-hover);
 }
 
 .wpafi-upgrade-btn .dashicons {
@@ -205,7 +310,7 @@
 	margin: 0 0 24px;
 	padding: 16px 20px;
 	background: var(--wpafi-card-bg);
-	border-radius: var(--wpafi-radius);
+	border-radius: 0 0 var(--wpafi-radius) var(--wpafi-radius);
 	box-shadow: var(--wpafi-shadow);
 	color: var(--wpafi-text-secondary);
 	font-size: 14px;
@@ -508,7 +613,7 @@
 	gap: 4px;
 	padding: 4px 10px;
 	background: var(--wpafi-pro-color);
-	border-radius: 4px;
+	border-radius: var(--wpafi-radius-sm);
 	font-size: 12px;
 	font-weight: 500;
 	color: #fff;
@@ -529,11 +634,41 @@
 .select2-container--default .select2-selection--multiple {
 	min-height: 38px;
 	border-color: var(--wpafi-border);
-	border-radius: 4px;
+	border-radius: var(--wpafi-radius-sm);
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-	padding: 2px 8px;
+	padding: 4px 8px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+	display: inline-flex;
+	align-items: center;
+	margin: 0;
+	padding: 4px 8px;
+	background: var(--wpafi-primary);
+	border: none;
+	border-radius: var(--wpafi-radius-sm);
+	color: #fff;
+	font-size: 12px;
+	line-height: 1.2;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+	color: rgba(255, 255, 255, 0.8);
+	margin-right: 6px;
+	order: -1;
+	font-size: 14px;
+	line-height: 1;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+	color: #fff;
+	background: transparent;
 }
 
 /* ==========================================================================
@@ -580,6 +715,12 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
+	transition: var(--wpafi-btn-transition);
+}
+
+.wpafi-bulk-actions .button-hero:hover {
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: var(--wpafi-btn-shadow-hover);
 }
 
 #wpafi-bulk-spinner {
@@ -616,6 +757,12 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
+	transition: var(--wpafi-btn-transition);
+}
+
+.wpafi-save-bar .button-hero:hover {
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: var(--wpafi-btn-shadow-hover);
 }
 
 /* ==========================================================================
@@ -1018,20 +1165,20 @@
 	align-items: center;
 	gap: 8px;
 	padding: 10px 20px;
-	background: linear-gradient(135deg, var(--wpafi-pro-color) 0%, #5a3a7e 100%);
+	background: var(--wpafi-pro-gradient);
 	border: none;
 	border-radius: var(--wpafi-radius);
 	color: #fff;
 	font-size: 13px;
 	font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s;
-	box-shadow: 0 2px 6px rgba(118, 75, 162, 0.3);
+	transition: var(--wpafi-btn-transition);
+	box-shadow: var(--wpafi-btn-shadow);
 }
 
 .wpafi-add-rule-btn:hover:not(:disabled) {
-	transform: translateY(-1px);
-	box-shadow: 0 3px 10px rgba(118, 75, 162, 0.4);
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: var(--wpafi-btn-shadow-hover);
 }
 
 .wpafi-add-rule-btn:disabled {
@@ -1174,17 +1321,6 @@
 	font-size: 14px;
 }
 
-.wpafi-unlock-btn {
-	background: var(--wpafi-pro-color) !important;
-	color: #fff !important;
-	border: none !important;
-	padding: 10px 24px !important;
-}
-
-.wpafi-unlock-btn:hover {
-	background: #5a3a7e !important;
-}
-
 /* Rule Behavior Options */
 .wpafi-rule-behavior {
 	display: flex;
@@ -1248,7 +1384,7 @@
 	align-items: center;
 	gap: 6px;
 	padding: 8px 12px;
-	background: #f8f9fa;
+	background: var(--wpafi-bg-light);
 	border: 2px solid var(--wpafi-border-light);
 	border-radius: var(--wpafi-radius);
 	cursor: pointer;
@@ -1259,12 +1395,12 @@
 
 .wpafi-radio-option:hover {
 	border-color: var(--wpafi-primary);
-	background: #f0f6fc;
+	background: rgba(155, 123, 192, 0.08);
 }
 
 .wpafi-radio-option.active {
 	border-color: var(--wpafi-primary);
-	background: #e7f3ff;
+	background: rgba(155, 123, 192, 0.12);
 }
 
 .wpafi-radio-option input[type="radio"] {
@@ -1280,6 +1416,85 @@
 
 .wpafi-radio-option.active .dashicons {
 	color: var(--wpafi-primary);
+}
+
+/* Pro-locked radio option */
+.wpafi-radio-option-pro-locked {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	border: 1px dashed #ccc;
+	border-radius: 6px;
+	background: #f9f9f9;
+	opacity: 0.7;
+	cursor: not-allowed;
+	position: relative;
+}
+
+.wpafi-radio-option-pro-locked .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: #999;
+}
+
+.wpafi-radio-option-pro-locked > span:not(.wpafi-pro-lock-badge) {
+	color: #666;
+}
+
+.wpafi-pro-lock-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	margin-left: auto;
+	padding: 2px 8px;
+	background: var(--wpafi-pro-gradient);
+	color: #fff;
+	font-size: 10px;
+	font-weight: 600;
+	border-radius: 3px;
+	text-transform: uppercase;
+}
+
+.wpafi-pro-lock-badge .dashicons {
+	font-size: 12px;
+	width: 12px;
+	height: 12px;
+	color: #fff;
+}
+
+/* Pro teaser option (same design as radio-option-pro-locked) */
+.wpafi-pro-teaser-option {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	border: 1px dashed #ccc;
+	border-radius: 6px;
+	background: #f9f9f9;
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.wpafi-pro-teaser-option .dashicons:first-child {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: #999;
+}
+
+.wpafi-pro-teaser-option > span:not(.wpafi-pro-lock-badge) {
+	color: #666;
+}
+
+.wpafi-pro-teasers {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #eee;
 }
 
 /* Source Panels */
@@ -1306,8 +1521,8 @@
 	display: flex;
 	gap: 12px;
 	padding: 15px;
-	background: #f0f6fc;
-	border: 1px solid #c8ddf0;
+	background: rgba(155, 123, 192, 0.08);
+	border: 1px solid rgba(155, 123, 192, 0.2);
 	border-radius: var(--wpafi-radius);
 }
 
@@ -1335,7 +1550,7 @@
 
 .wpafi-external-url-input {
 	padding: 15px;
-	background: #f8f9fa;
+	background: var(--wpafi-bg-light);
 	border: 1px solid var(--wpafi-border-light);
 	border-radius: var(--wpafi-radius);
 }
@@ -1419,6 +1634,7 @@
 /* Bulk Operations Tab Card */
 .wpafi-bulk-card {
 	margin-top: 0;
+	border-radius: 0 0 var(--wpafi-radius) var(--wpafi-radius);
 }
 
 .wpafi-bulk-rule-select {
@@ -1720,9 +1936,9 @@
 .wpafi-checkbox-large {
 	font-size: 14px;
 	padding: 12px 15px;
-	background: #f8f9fa;
+	background: var(--wpafi-bg-light);
 	border-radius: var(--wpafi-radius);
-	margin-bottom: 20px;
+	margin-bottom: 16px;
 }
 
 .wpafi-checkbox-large span {
@@ -1730,11 +1946,23 @@
 }
 
 .wpafi-column-settings {
-	margin-top: 20px;
-	padding: 20px;
-	background: #f8f9fa;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-top: 16px;
+	padding: 16px;
+	background: var(--wpafi-bg-light);
 	border-radius: var(--wpafi-radius);
 	border: 1px solid var(--wpafi-border-light);
+}
+
+.wpafi-column-settings .wpafi-condition-row {
+	grid-column: span 1;
+}
+
+.wpafi-column-settings .wpafi-column-preview {
+	grid-column: span 2;
+	margin-top: 0;
 }
 
 .wpafi-size-row {
@@ -1763,14 +1991,14 @@
 }
 
 .wpafi-column-preview {
-	margin-top: 20px;
-	padding: 15px;
-	background: #fff;
+	margin-top: 0;
+	padding: 12px 15px;
+	background: var(--wpafi-card-bg);
 	border: 1px dashed var(--wpafi-border);
-	border-radius: var(--wpafi-radius);
+	border-radius: var(--wpafi-radius-sm);
 	display: flex;
 	align-items: center;
-	gap: 15px;
+	gap: 12px;
 }
 
 .wpafi-preview-label {
@@ -1798,39 +2026,10 @@
 	margin-top: 20px;
 	padding-top: 20px;
 	border-top: 1px dashed var(--wpafi-border);
-}
-
-/* Locked Checkbox */
-.wpafi-pro-locked {
-	opacity: 0.7;
-	cursor: not-allowed;
-}
-
-.wpafi-pro-locked input {
-	cursor: not-allowed;
-}
-
-.wpafi-pro-locked .wpafi-pro-badge {
-	margin-left: 8px;
-	font-size: 10px;
-	padding: 2px 6px;
-}
-
-/* Locked Row with Button */
-.wpafi-pro-locked-row {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: 10px;
-	margin-top: 12px;
-}
-
-.wpafi-pro-locked-row button {
-	opacity: 0.6;
-	cursor: not-allowed;
-}
-
-.wpafi-pro-locked-row button .dashicons {
-	margin-right: 4px;
+	gap: 16px;
 }
 
 /* Pro Features Card */
@@ -1841,7 +2040,7 @@
 }
 
 .wpafi-pro-header {
-	background: linear-gradient(135deg, var(--wpafi-pro-color) 0%, #667eea 100%);
+	background: var(--wpafi-pro-gradient);
 }
 
 .wpafi-pro-header h2,
@@ -1883,7 +2082,7 @@
 .wpafi-pro-feature-item {
 	text-align: center;
 	padding: 20px;
-	background: #f8f9fa;
+	background: var(--wpafi-bg-light);
 	border-radius: var(--wpafi-radius);
 	border: 1px solid var(--wpafi-border-light);
 }
@@ -1919,7 +2118,7 @@
 
 .wpafi-pro-option {
 	padding: 15px;
-	background: #f8f9fa;
+	background: var(--wpafi-bg-light);
 	border-radius: var(--wpafi-radius);
 	border: 1px solid var(--wpafi-border-light);
 }
@@ -2036,7 +2235,7 @@
 	font-size: 28px;
 	width: 28px;
 	height: 28px;
-	color: #764ba2;
+	color: var(--wpafi-primary);
 }
 
 .wpafi-pro-showcase-header h3 {
@@ -2073,8 +2272,8 @@
 	font-size: 32px;
 	width: 32px;
 	height: 32px;
-	color: #667eea;
-	margin-bottom: 12px;
+	color: var(--wpafi-primary);
+	margin: 0 auto 12px auto;
 	display: block;
 }
 
@@ -2098,7 +2297,7 @@
 }
 
 .wpafi-pro-showcase-cta .button {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: var(--wpafi-pro-gradient);
 	border: none;
 	color: #fff;
 	padding: 12px 30px;
@@ -2110,12 +2309,12 @@
 	align-items: center;
 	gap: 8px;
 	transition: all 0.3s ease;
-	box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+	box-shadow: var(--wpafi-shadow-pro);
 }
 
 .wpafi-pro-showcase-cta .button:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 6px 20px rgba(118, 75, 162, 0.5);
+	box-shadow: var(--wpafi-shadow-pro);
 	color: #fff;
 }
 
@@ -2145,5 +2344,324 @@
 
 	.wpafi-pro-showcase-item {
 		padding: 15px;
+	}
+}
+
+/* ============================================
+   Help Tab Styles
+   ============================================ */
+
+.wpafi-help-content {
+	max-width: 900px;
+}
+
+.wpafi-help-section {
+	margin-bottom: 24px;
+}
+
+.wpafi-help-section h2 {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	padding: 16px 20px;
+	background: var(--wpafi-bg-light);
+	border: 1px solid var(--wpafi-border);
+	border-bottom: none;
+	border-radius: var(--wpafi-radius) var(--wpafi-radius) 0 0;
+	color: var(--wpafi-text);
+	font-size: 15px;
+}
+
+.wpafi-help-section h2 .dashicons {
+	color: var(--wpafi-primary);
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.wpafi-help-card {
+	background: var(--wpafi-card-bg);
+	border: 1px solid var(--wpafi-border);
+	border-radius: 0 0 var(--wpafi-radius) var(--wpafi-radius);
+	padding: 20px;
+	box-shadow: var(--wpafi-shadow);
+}
+
+.wpafi-help-card h3 {
+	margin: 20px 0 10px 0;
+	color: var(--wpafi-text);
+	font-size: 15px;
+}
+
+.wpafi-help-card h3:first-child {
+	margin-top: 0;
+}
+
+.wpafi-help-card p {
+	color: var(--wpafi-text-secondary);
+	line-height: 1.6;
+	margin: 0 0 15px 0;
+}
+
+.wpafi-help-card ul,
+.wpafi-help-card ol {
+	margin: 0 0 15px 20px;
+	color: var(--wpafi-text-secondary);
+	line-height: 1.8;
+}
+
+.wpafi-help-card li {
+	margin-bottom: 8px;
+}
+
+.wpafi-help-card li strong {
+	color: var(--wpafi-text);
+}
+
+/* Help Warning Box */
+.wpafi-help-warning {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	background: #fff8e5;
+	border: 1px solid #f0c33c;
+	border-left: 4px solid var(--wpafi-warning);
+	border-radius: var(--wpafi-radius-sm);
+	padding: 15px;
+	margin-top: 15px;
+}
+
+.wpafi-help-warning .dashicons {
+	color: var(--wpafi-warning);
+	flex-shrink: 0;
+	margin-top: 2px;
+}
+
+.wpafi-help-warning p {
+	margin: 0;
+	color: #654b00;
+}
+
+/* FAQ Styles */
+.wpafi-faq .wpafi-faq-item {
+	padding: 15px 0;
+	border-bottom: 1px solid #e2e4e7;
+}
+
+.wpafi-faq .wpafi-faq-item:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.wpafi-faq .wpafi-faq-item:first-child {
+	padding-top: 0;
+}
+
+.wpafi-faq .wpafi-faq-item h4 {
+	margin: 0 0 8px 0;
+	color: var(--wpafi-text);
+	font-size: 14px;
+}
+
+.wpafi-faq .wpafi-faq-item p {
+	margin: 0;
+}
+
+/* Support Links */
+.wpafi-help-support {
+	text-align: center;
+}
+
+.wpafi-support-options {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 20px;
+}
+
+.wpafi-support-link {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 20px 30px;
+	background: var(--wpafi-bg);
+	border: 1px solid var(--wpafi-border);
+	border-radius: var(--wpafi-radius);
+	text-decoration: none;
+	color: var(--wpafi-text-secondary);
+	transition: all 0.2s ease;
+	min-width: 140px;
+}
+
+.wpafi-support-link:hover {
+	background: var(--wpafi-card-bg);
+	border-color: var(--wpafi-primary);
+	color: var(--wpafi-primary);
+	box-shadow: 0 2px 8px rgba(155, 123, 192, 0.25);
+	transform: translateY(-2px);
+}
+
+.wpafi-support-link .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+}
+
+.wpafi-support-link:hover .dashicons {
+	color: var(--wpafi-primary);
+}
+
+/* Full Documentation Button */
+.wpafi-help-support-intro {
+	text-align: center;
+	color: var(--wpafi-text-secondary);
+	margin-bottom: 20px;
+}
+
+.wpafi-docs-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin: 0 auto 30px auto;
+	padding: 12px 30px;
+	font-size: 15px;
+}
+
+.wpafi-docs-btn .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	line-height: 1;
+}
+
+/* Help Tab Responsive */
+@media (max-width: 782px) {
+	.wpafi-help-card {
+		padding: 15px 20px;
+	}
+
+	.wpafi-support-options {
+		flex-direction: column;
+	}
+
+	.wpafi-support-link {
+		flex-direction: row;
+		justify-content: flex-start;
+		padding: 15px 20px;
+		min-width: auto;
+	}
+
+	.wpafi-support-link .dashicons {
+		font-size: 24px;
+		width: 24px;
+		height: 24px;
+	}
+}
+
+/* ============================================
+   Pro Priority Support (Locked Section)
+   ============================================ */
+
+.wpafi-help-pro-locked h2 {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--wpafi-text);
+}
+
+.wpafi-help-pro-locked h2 .dashicons-lock {
+	color: var(--wpafi-warning);
+}
+
+/* Help Tab Pro Badge - smaller, gradient variant */
+.wpafi-help-pro-locked .wpafi-pro-badge {
+	font-size: 10px;
+	font-weight: 700;
+	padding: 3px 8px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.wpafi-pro-support-card {
+	background: linear-gradient(135deg, #f8f9ff 0%, #fff5f8 100%);
+	border: 2px dashed var(--wpafi-border);
+	position: relative;
+	overflow: hidden;
+}
+
+.wpafi-pro-support-overlay {
+	padding: 10px 0;
+}
+
+.wpafi-pro-support-features {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20px;
+	margin-bottom: 25px;
+}
+
+.wpafi-pro-support-feature {
+	display: flex;
+	gap: 15px;
+	align-items: flex-start;
+}
+
+.wpafi-pro-support-feature .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: var(--wpafi-primary);
+	flex-shrink: 0;
+	margin-top: 2px;
+}
+
+.wpafi-pro-support-feature strong {
+	display: block;
+	color: var(--wpafi-text);
+	margin-bottom: 4px;
+}
+
+.wpafi-pro-support-feature p {
+	margin: 0;
+	font-size: 13px;
+	color: var(--wpafi-text-secondary);
+	line-height: 1.4;
+}
+
+.wpafi-unlock-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin: 0 auto;
+	background: var(--wpafi-pro-gradient);
+	border: none;
+	padding: 12px 30px;
+	font-size: 15px;
+	color: #fff;
+	border-radius: var(--wpafi-radius);
+	transition: var(--wpafi-btn-transition);
+	box-shadow: var(--wpafi-btn-shadow);
+}
+
+.wpafi-unlock-btn:hover {
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: var(--wpafi-btn-shadow-hover);
+}
+
+.wpafi-unlock-btn .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	line-height: 1;
+}
+
+/* Pro Locked Section Responsive */
+@media (max-width: 782px) {
+	.wpafi-pro-support-features {
+		grid-template-columns: 1fr;
 	}
 }

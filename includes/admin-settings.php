@@ -28,6 +28,9 @@ $post_statuses    = array(
 );
 ?>
 <div class="wrap wpafi-settings-wrap">
+	<!-- WordPress injects admin_notices after first h1/h2 in .wrap -->
+	<h1 class="wp-heading-inline" style="display:none;"></h1>
+
 	<!-- Hidden settings errors - will be converted to toast -->
 	<div id="wpafi-settings-messages" style="display:none;">
 		<?php settings_errors( 'wpafi_options' ); ?>
@@ -54,24 +57,28 @@ $post_statuses    = array(
 	<!-- Toast Container -->
 	<div id="wpafi-toast-container"></div>
 
-	<!-- Tabs Navigation -->
-	<div class="wpafi-tabs">
-		<button type="button" class="wpafi-tab-btn active" data-tab="rules">
-			<span class="dashicons dashicons-format-image"></span>
-			<?php esc_html_e( 'Image Rules', 'sny-auto-featured-image' ); ?>
-		</button>
-		<button type="button" class="wpafi-tab-btn" data-tab="bulk">
-			<span class="dashicons dashicons-update"></span>
-			<?php esc_html_e( 'Bulk Operations', 'sny-auto-featured-image' ); ?>
-		</button>
-		<button type="button" class="wpafi-tab-btn" data-tab="settings">
-			<span class="dashicons dashicons-admin-settings"></span>
-			<?php esc_html_e( 'Settings', 'sny-auto-featured-image' ); ?>
-		</button>
-	</div>
-
 	<div class="wpafi-content">
 		<div class="wpafi-main">
+			<!-- Tabs Navigation -->
+			<div class="wpafi-tabs">
+				<button type="button" class="wpafi-tab-btn active" data-tab="rules">
+					<span class="dashicons dashicons-format-image"></span>
+					<?php esc_html_e( 'Image Rules', 'sny-auto-featured-image' ); ?>
+				</button>
+				<button type="button" class="wpafi-tab-btn" data-tab="bulk">
+					<span class="dashicons dashicons-update"></span>
+					<?php esc_html_e( 'Bulk Operations', 'sny-auto-featured-image' ); ?>
+				</button>
+				<button type="button" class="wpafi-tab-btn" data-tab="settings">
+					<span class="dashicons dashicons-admin-settings"></span>
+					<?php esc_html_e( 'Settings', 'sny-auto-featured-image' ); ?>
+				</button>
+				<button type="button" class="wpafi-tab-btn" data-tab="help">
+					<span class="dashicons dashicons-editor-help"></span>
+					<?php esc_html_e( 'Help', 'sny-auto-featured-image' ); ?>
+				</button>
+			</div>
+
 			<form method="post" action="options.php" id="wpafi-settings-form">
 				<?php settings_fields( 'wp_auto_featured_image_options' ); ?>
 
@@ -146,12 +153,12 @@ $post_statuses    = array(
 					<?php if ( $show_pro_teasers ) : ?>
 					<div class="wpafi-pro-showcase">
 						<div class="wpafi-pro-showcase-header">
-							<span class="dashicons dashicons-superhero"></span>
+							<span class="dashicons dashicons-star-filled"></span>
 							<h3><?php esc_html_e( 'Unlock More with Pro', 'sny-auto-featured-image' ); ?></h3>
 						</div>
 						<div class="wpafi-pro-showcase-grid">
 							<div class="wpafi-pro-showcase-item">
-								<span class="dashicons dashicons-infinity"></span>
+								<span class="dashicons dashicons-plus-alt2"></span>
 								<h4><?php esc_html_e( 'Unlimited Rules', 'sny-auto-featured-image' ); ?></h4>
 								<p><?php esc_html_e( 'Create as many conditional rules as you need', 'sny-auto-featured-image' ); ?></p>
 							</div>
@@ -263,17 +270,21 @@ $post_statuses    = array(
 							<!-- Pro Feature Teasers -->
 							<?php if ( $show_pro_teasers ) : ?>
 							<div class="wpafi-pro-teasers">
-								<label class="wpafi-checkbox wpafi-pro-locked">
-									<input type="checkbox" disabled />
+								<div class="wpafi-pro-teaser-option">
+									<span class="dashicons dashicons-visibility"></span>
 									<span><?php esc_html_e( 'Dry run mode (preview changes without applying)', 'sny-auto-featured-image' ); ?></span>
-									<span class="wpafi-pro-badge"><?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?></span>
-								</label>
-								<div class="wpafi-pro-locked-row">
-									<button type="button" class="button" disabled>
-										<span class="dashicons dashicons-undo"></span>
-										<?php esc_html_e( 'Undo Last Operation', 'sny-auto-featured-image' ); ?>
-									</button>
-									<span class="wpafi-pro-badge"><?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?></span>
+									<span class="wpafi-pro-lock-badge">
+										<span class="dashicons dashicons-lock"></span>
+										<?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?>
+									</span>
+								</div>
+								<div class="wpafi-pro-teaser-option">
+									<span class="dashicons dashicons-undo"></span>
+									<span><?php esc_html_e( 'Undo Last Operation', 'sny-auto-featured-image' ); ?></span>
+									<span class="wpafi-pro-lock-badge">
+										<span class="dashicons dashicons-lock"></span>
+										<?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?>
+									</span>
 								</div>
 							</div>
 							<?php endif; ?>
@@ -356,6 +367,256 @@ $post_statuses    = array(
 						</div>
 					</div><!-- End Section: Display Options -->
 				</div><!-- End Tab: Settings -->
+
+				<!-- Tab: Help -->
+				<div id="wpafi-tab-help" class="wpafi-tab-panel">
+					<div class="wpafi-help-content">
+
+						<!-- Getting Started -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-welcome-learn-more"></span>
+								<?php esc_html_e( 'Getting Started', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card">
+								<p><?php esc_html_e( 'Auto Featured Image automatically sets featured images for your posts based on rules you define. Here\'s how to get started:', 'sny-auto-featured-image' ); ?></p>
+								<ol>
+									<li><?php esc_html_e( 'Go to the Image Rules tab', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Configure Image Rule #1 (already visible by default)', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Select a default image from your media library', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Set conditions (optional) to target specific posts', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Click "Add Rule" to create additional rules if needed', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Save your settings', 'sny-auto-featured-image' ); ?></li>
+								</ol>
+							</div>
+						</div>
+
+						<!-- Image Rules -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-format-image"></span>
+								<?php esc_html_e( 'Image Rules', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card">
+								<h3><?php esc_html_e( 'What are Image Rules?', 'sny-auto-featured-image' ); ?></h3>
+								<p><?php esc_html_e( 'Image Rules let you define which featured image should be used for posts matching specific conditions. Rules are processed in order from top to bottom - the first matching rule wins.', 'sny-auto-featured-image' ); ?></p>
+
+								<h3><?php esc_html_e( 'Rule Priority', 'sny-auto-featured-image' ); ?></h3>
+								<p><?php esc_html_e( 'Rules at the top of the list have higher priority. Drag and drop rules to reorder them. When a post is saved, the plugin checks each rule in order and applies the first one that matches.', 'sny-auto-featured-image' ); ?></p>
+
+								<h3><?php esc_html_e( 'Conditions', 'sny-auto-featured-image' ); ?></h3>
+								<p><?php esc_html_e( 'Each rule can have multiple conditions that must ALL be met (AND logic). Available conditions:', 'sny-auto-featured-image' ); ?></p>
+								<ul>
+									<li><strong><?php esc_html_e( 'Post Type:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Apply to specific post types (Posts, Pages, Products, etc.)', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Category:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Apply to posts in specific categories', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Tag:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Apply to posts with specific tags', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Post Status:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Apply to published, draft, pending, or scheduled posts', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+
+								<h3><?php esc_html_e( 'Example Use Cases', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><?php esc_html_e( 'Set a "News" category image for all news posts', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Use a product placeholder for WooCommerce products', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Apply a default blog image for all posts without conditions', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+							</div>
+						</div>
+
+						<!-- Bulk Operations -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-update"></span>
+								<?php esc_html_e( 'Bulk Operations', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card">
+								<h3><?php esc_html_e( 'Generate Featured Images', 'sny-auto-featured-image' ); ?></h3>
+								<p><?php esc_html_e( 'This feature scans your existing posts and automatically assigns featured images based on your defined rules. Perfect for:', 'sny-auto-featured-image' ); ?></p>
+								<ul>
+									<li><?php esc_html_e( 'Migrating from another theme or plugin', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Applying rules to older posts that don\'t have featured images', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Updating images after changing your rules', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+
+								<h3><?php esc_html_e( 'Bulk Options', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><strong><?php esc_html_e( 'Post Types:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Select which post types to process', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Categories:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Limit to specific categories', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Overwrite Existing:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Choose whether to replace existing featured images or only fill empty ones', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+
+								<div class="wpafi-help-warning">
+									<span class="dashicons dashicons-warning"></span>
+									<p><?php esc_html_e( 'Warning: Bulk operations can modify many posts at once. Consider backing up your database before running bulk operations with "Overwrite Existing" enabled.', 'sny-auto-featured-image' ); ?></p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Settings -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-admin-settings"></span>
+								<?php esc_html_e( 'Settings Explained', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card">
+								<h3><?php esc_html_e( 'Auto-Generation', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><strong><?php esc_html_e( 'Enable Auto Featured Image:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'When enabled, the plugin automatically sets featured images when posts are saved (created or updated).', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+
+								<h3><?php esc_html_e( 'Default Image', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><strong><?php esc_html_e( 'Global Default Image:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'This fallback image is used when no rules match a post. Select an image from your media library to serve as the ultimate fallback.', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+
+								<h3><?php esc_html_e( 'Post List Display', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><strong><?php esc_html_e( 'Show Featured Image Column:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Adds a thumbnail column to the post list in the admin, making it easy to see which posts have featured images.', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Column Size:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Adjust the thumbnail size in the post list (40-100 pixels).', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+							</div>
+						</div>
+
+						<!-- How Auto-Assignment Works -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-info"></span>
+								<?php esc_html_e( 'How Auto-Assignment Works', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card">
+								<p><?php esc_html_e( 'When a post is saved, the plugin follows this process:', 'sny-auto-featured-image' ); ?></p>
+								<ol>
+									<li><?php esc_html_e( 'Check if the post already has a featured image (skip if it does, unless overwrite is enabled)', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Loop through Image Rules from top to bottom', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'For each rule, check if ALL conditions match the post', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'If a rule matches, apply its image and stop', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'If no rules match, use the Global Default Image (if set)', 'sny-auto-featured-image' ); ?></li>
+								</ol>
+
+								<h3><?php esc_html_e( 'Tips for Best Results', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><?php esc_html_e( 'Put more specific rules at the top (e.g., "Category: News" before "All Posts")', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Use a catch-all rule at the bottom with no conditions as a fallback', 'sny-auto-featured-image' ); ?></li>
+									<li><?php esc_html_e( 'Test your rules with a draft post before applying bulk operations', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+							</div>
+						</div>
+
+						<!-- FAQ -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-editor-help"></span>
+								<?php esc_html_e( 'Frequently Asked Questions', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card wpafi-faq">
+								<div class="wpafi-faq-item">
+									<h4><?php esc_html_e( 'Why isn\'t my featured image being set?', 'sny-auto-featured-image' ); ?></h4>
+									<p><?php esc_html_e( 'Check that: 1) Auto-generation is enabled in Settings, 2) Your rules have valid conditions, 3) The post matches at least one rule\'s conditions, 4) The post doesn\'t already have a featured image (unless you\'re using bulk operations with overwrite).', 'sny-auto-featured-image' ); ?></p>
+								</div>
+
+								<div class="wpafi-faq-item">
+									<h4><?php esc_html_e( 'Can I use different images for different categories?', 'sny-auto-featured-image' ); ?></h4>
+									<p><?php esc_html_e( 'Yes! Create multiple rules, each with a different category condition and image. Remember to order them by priority.', 'sny-auto-featured-image' ); ?></p>
+								</div>
+
+								<div class="wpafi-faq-item">
+									<h4><?php esc_html_e( 'Does this work with WooCommerce?', 'sny-auto-featured-image' ); ?></h4>
+									<p><?php esc_html_e( 'Yes, the plugin works with any public post type including WooCommerce Products. Select "Products" as the post type in your rule conditions.', 'sny-auto-featured-image' ); ?></p>
+								</div>
+
+								<div class="wpafi-faq-item">
+									<h4><?php esc_html_e( 'Will this overwrite my existing featured images?', 'sny-auto-featured-image' ); ?></h4>
+									<p><?php esc_html_e( 'By default, no. The plugin only sets featured images on posts that don\'t have one. In Bulk Operations, you can optionally enable "Overwrite Existing" to replace existing images.', 'sny-auto-featured-image' ); ?></p>
+								</div>
+
+								<div class="wpafi-faq-item">
+									<h4><?php esc_html_e( 'What happens if I delete a rule?', 'sny-auto-featured-image' ); ?></h4>
+									<p><?php esc_html_e( 'Existing featured images are not affected. Only new posts (or posts processed through Bulk Operations) will use the updated rules.', 'sny-auto-featured-image' ); ?></p>
+								</div>
+							</div>
+						</div>
+
+						<?php if ( $show_pro_teasers ) : ?>
+						<!-- Pro Priority Support (Locked) -->
+						<div class="wpafi-help-section wpafi-help-pro-locked">
+							<h2>
+								<span class="dashicons dashicons-lock"></span>
+								<?php esc_html_e( 'Priority Support', 'sny-auto-featured-image' ); ?>
+								<span class="wpafi-pro-badge"><?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?></span>
+							</h2>
+							<div class="wpafi-help-card wpafi-pro-support-card">
+								<div class="wpafi-pro-support-overlay">
+									<div class="wpafi-pro-support-features">
+										<div class="wpafi-pro-support-feature">
+											<span class="dashicons dashicons-email-alt"></span>
+											<div>
+												<strong><?php esc_html_e( 'Direct Email Support', 'sny-auto-featured-image' ); ?></strong>
+												<p><?php esc_html_e( 'Get personal responses within 24 hours from our development team.', 'sny-auto-featured-image' ); ?></p>
+											</div>
+										</div>
+										<div class="wpafi-pro-support-feature">
+											<span class="dashicons dashicons-admin-tools"></span>
+											<div>
+												<strong><?php esc_html_e( 'Setup Assistance', 'sny-auto-featured-image' ); ?></strong>
+												<p><?php esc_html_e( 'We\'ll help configure the plugin for your specific use case.', 'sny-auto-featured-image' ); ?></p>
+											</div>
+										</div>
+										<div class="wpafi-pro-support-feature">
+											<span class="dashicons dashicons-update"></span>
+											<div>
+												<strong><?php esc_html_e( 'Priority Bug Fixes', 'sny-auto-featured-image' ); ?></strong>
+												<p><?php esc_html_e( 'Your issues are prioritized in our development queue.', 'sny-auto-featured-image' ); ?></p>
+											</div>
+										</div>
+										<div class="wpafi-pro-support-feature">
+											<span class="dashicons dashicons-video-alt3"></span>
+											<div>
+												<strong><?php esc_html_e( 'Video Tutorials', 'sny-auto-featured-image' ); ?></strong>
+												<p><?php esc_html_e( 'Access exclusive step-by-step video guides.', 'sny-auto-featured-image' ); ?></p>
+											</div>
+										</div>
+									</div>
+									<a href="<?php echo esc_url( wpafi_get_upgrade_url( 'help-priority' ) ); ?>" target="_blank" class="button button-primary button-hero wpafi-unlock-btn">
+										<span class="dashicons dashicons-unlock"></span>
+										<?php esc_html_e( 'Unlock Priority Support', 'sny-auto-featured-image' ); ?>
+									</a>
+								</div>
+							</div>
+						</div>
+						<?php endif; ?>
+
+						<!-- Support -->
+						<div class="wpafi-help-section">
+							<h2>
+								<span class="dashicons dashicons-sos"></span>
+								<?php esc_html_e( 'Need More Help?', 'sny-auto-featured-image' ); ?>
+							</h2>
+							<div class="wpafi-help-card wpafi-help-support">
+								<p class="wpafi-help-support-intro">
+									<?php esc_html_e( 'Visit our website for detailed tutorials, video guides, and the latest updates.', 'sny-auto-featured-image' ); ?>
+								</p>
+								<a href="https://sanny.dev/plugins/auto-featured-image/?utm_source=plugin&amp;utm_medium=help-tab&amp;utm_campaign=docs" target="_blank" class="button button-primary button-hero wpafi-docs-btn">
+									<span class="dashicons dashicons-book"></span>
+									<?php esc_html_e( 'View Full Documentation', 'sny-auto-featured-image' ); ?>
+								</a>
+								<div class="wpafi-support-options">
+									<a href="https://wordpress.org/support/plugin/wp-auto-featured-image/" target="_blank" class="wpafi-support-link">
+										<span class="dashicons dashicons-format-chat"></span>
+										<span><?php esc_html_e( 'Support Forum', 'sny-auto-featured-image' ); ?></span>
+									</a>
+									<a href="https://wordpress.org/plugins/wp-auto-featured-image/#reviews" target="_blank" class="wpafi-support-link">
+										<span class="dashicons dashicons-star-filled"></span>
+										<span><?php esc_html_e( 'Leave a Review', 'sny-auto-featured-image' ); ?></span>
+									</a>
+									<a href="https://github.com/sannysri/WordPress-Auto-Featured-Image/issues" target="_blank" class="wpafi-support-link">
+										<span class="dashicons dashicons-flag"></span>
+										<span><?php esc_html_e( 'Report a Bug', 'sny-auto-featured-image' ); ?></span>
+									</a>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div><!-- End Tab: Help -->
 
 			</form>
 		</div>
@@ -464,6 +725,10 @@ $post_statuses    = array(
  * @param array      $post_statuses Available post statuses.
  */
 function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_types, $post_statuses ) {
+	// Determine if Pro teasers should show (recalculate since we're in a separate function).
+	$has_pro          = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
+	$show_pro_teasers = ! $has_pro && function_exists( 'wpafi_should_show_pro_teasers' ) && wpafi_should_show_pro_teasers();
+
 	$image_id          = isset( $rule['image_id'] ) ? $rule['image_id'] : 0;
 	$image_source      = isset( $rule['image_source'] ) ? $rule['image_source'] : 'media';
 	$external_url      = isset( $rule['external_url'] ) ? $rule['external_url'] : '';
@@ -486,12 +751,8 @@ function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_
 			<span class="wpafi-rule-number">
 				<span class="dashicons dashicons-format-image"></span>
 				<?php
-				if ( 0 === $index || '0' === $index ) {
-					esc_html_e( 'Default Featured Image', 'sny-auto-featured-image' );
-				} else {
-					/* translators: %s is rule number */
-					printf( esc_html__( 'Rule #%s', 'sny-auto-featured-image' ), '<span class="wpafi-rule-index">' . esc_html( $rule_number ) . '</span>' );
-				}
+				/* translators: %s is rule number */
+				printf( esc_html__( 'Image Rule #%s', 'sny-auto-featured-image' ), '<span class="wpafi-rule-index">' . esc_html( $rule_number ) . '</span>' );
 				?>
 			</span>
 			<input type="text" name="wpafi_options[wpafi_rules][<?php echo esc_attr( $index ); ?>][name]"
@@ -531,6 +792,16 @@ function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_
 					<span class="dashicons dashicons-admin-links"></span>
 					<span><?php esc_html_e( 'External URL', 'sny-auto-featured-image' ); ?></span>
 				</label>
+				<?php if ( $show_pro_teasers ) : ?>
+				<div class="wpafi-radio-option wpafi-radio-option-pro-locked">
+					<span class="dashicons dashicons-database"></span>
+					<span><?php esc_html_e( 'ACF/Custom Fields', 'sny-auto-featured-image' ); ?></span>
+					<span class="wpafi-pro-lock-badge">
+						<span class="dashicons dashicons-lock"></span>
+						<?php esc_html_e( 'PRO', 'sny-auto-featured-image' ); ?>
+					</span>
+				</div>
+				<?php endif; ?>
 			</div>
 		</div>
 

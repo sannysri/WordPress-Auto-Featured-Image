@@ -134,8 +134,9 @@ jQuery(document).ready(function ($) {
 
 	(function () {
 		// Check both our hidden container AND any auto-injected notices by WordPress.
+		// Exclude review notice - it should stay as a banner.
 		const $allNotices = $(
-			'#wpafi-settings-messages .notice, .wpafi-settings-wrap .notice, .wpafi-settings-wrap .updated, .wpafi-settings-wrap .error'
+			'#wpafi-settings-messages .notice, .wpafi-settings-wrap .notice:not(.wpafi-review-notice), .wpafi-settings-wrap .updated, .wpafi-settings-wrap .error'
 		);
 
 		$allNotices.each(function () {
@@ -325,6 +326,9 @@ jQuery(document).ready(function ($) {
 			return;
 		}
 
+		// Use current count as index to avoid gaps after deletions.
+		ruleIndex = currentRuleCount;
+
 		let template = $('#wpafi-rule-template').html();
 		template = template.replace(/\{\{INDEX\}\}/g, ruleIndex);
 
@@ -339,7 +343,8 @@ jQuery(document).ready(function ($) {
 		// Initialize Select2 on new rule.
 		initRuleSelect2();
 
-		ruleIndex++;
+		// Re-index all rules to ensure consistent numbering.
+		reindexAllRules();
 
 		updateAddRuleButton();
 		updateRuleLimitText();
@@ -351,18 +356,43 @@ jQuery(document).ready(function ($) {
 		e.preventDefault();
 		$(this).closest('.wpafi-rule-card').remove();
 		updateAddRuleButton();
-		updateRuleNumbers();
+		reindexAllRules();
 		updateRuleLimitText();
 		wpafi.toast('Rule removed', 'warning');
 	});
 
-	// Update rule numbers after removal.
-	function updateRuleNumbers() {
+	// Re-index all rules after add/remove to ensure consistent numbering.
+	function reindexAllRules() {
 		$('#wpafi-rules-container .wpafi-rule-card').each(function (i) {
-			$(this)
-				.find('.wpafi-rule-index')
-				.text(i + 1);
+			const $card = $(this);
+
+			// Update display number.
+			$card.find('.wpafi-rule-index').text(i + 1);
+
+			// Update data-index attribute.
+			$card.attr('data-index', i);
+
+			// Update all form field names with new index.
+			$card.find('[name*="wpafi_rules"]').each(function () {
+				const $field = $(this);
+				const name = $field.attr('name');
+				if (name) {
+					const newName = name.replace(
+						/wpafi_rules\]\[\d+\]/,
+						'wpafi_rules][' + i + ']'
+					);
+					$field.attr('name', newName);
+				}
+			});
 		});
+
+		// Update ruleIndex for next add.
+		ruleIndex = $('#wpafi-rules-container .wpafi-rule-card').length;
+	}
+
+	// Legacy function name for compatibility.
+	function updateRuleNumbers() {
+		reindexAllRules();
 	}
 
 	// Update rule limit text.
