@@ -32,6 +32,10 @@
 	--wpafi-pro-color: #9b7bc0;
 	--wpafi-pro-gradient: linear-gradient(135deg, #9b7bc0 0%, #7c5ba0 100%);
 
+	--wpafi-warning-bg: #fff8e5;
+	--wpafi-warning-border: #f0c33c;
+	--wpafi-warning-text: #654b00;
+
 	/* Button tokens */
 	--wpafi-btn-transition: all 0.2s ease;
 	--wpafi-btn-hover-lift: translateY(-2px);
@@ -626,15 +630,24 @@
 }
 
 /* Select2 Fixes */
-.wpafi-select {
+.wpafi-select2 {
 	max-width: 400px;
 	width: 100%;
 }
 
-.select2-container--default .select2-selection--multiple {
+.select2-container--default .select2-selection--multiple,
+.select2-container--default .select2-selection--single {
 	min-height: 38px;
 	border-color: var(--wpafi-border);
 	border-radius: var(--wpafi-radius-sm);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--focus .select2-selection--single {
+	border-color: var(--wpafi-primary);
+	box-shadow: 0 0 0 2px rgba(155, 123, 192, 0.1);
+	outline: none;
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
@@ -669,6 +682,26 @@
 .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
 	color: #fff;
 	background: transparent;
+}
+
+/* Single Select Specific Styling to match Height */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+	line-height: 36px;
+	padding-left: 12px;
+	color: var(--wpafi-text);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	height: 36px;
+	right: 8px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+	border-color: var(--wpafi-text-secondary) transparent transparent transparent;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+	border-color: transparent transparent var(--wpafi-text-secondary) transparent;
 }
 
 /* ==========================================================================
@@ -2424,8 +2457,8 @@
 	display: flex;
 	align-items: flex-start;
 	gap: 12px;
-	background: #fff8e5;
-	border: 1px solid #f0c33c;
+	background: var(--wpafi-warning-bg);
+	border: 1px solid var(--wpafi-warning-border);
 	border-left: 4px solid var(--wpafi-warning);
 	border-radius: var(--wpafi-radius-sm);
 	padding: 15px;
@@ -2440,7 +2473,7 @@
 
 .wpafi-help-warning p {
 	margin: 0;
-	color: #654b00;
+	color: var(--wpafi-warning-text);
 }
 
 /* FAQ Styles */

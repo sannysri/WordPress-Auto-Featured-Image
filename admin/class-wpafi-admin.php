@@ -123,16 +123,22 @@ class WPAFI_Admin {
 	public function enqueue_scripts() {
 		$has_pro_features = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
 
+		// Register Select2 JS and CSS early so they can be used as dependencies.
+		wp_register_script( 'select2-js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
+		wp_register_style( 'select2-css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
+
 		// Enqueue the main plugin stylesheet.
 		wp_enqueue_style( 'wpafi-style', WPAFI_PLUGIN_URL . '/css/wpafi-style.css', array(), WPAFI_VERSION );
 
-		// Register and enqueue the main script with dependencies.
-		wp_register_script( 'wpafi-script', WPAFI_PLUGIN_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox' ), WPAFI_VERSION, true );
+		// Register the main script with dependencies.
+		wp_register_script( 'wpafi-script', WPAFI_PLUGIN_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox', 'select2-js' ), WPAFI_VERSION, true );
 
 		// Check if the current screen is the WP Auto Featured Image settings page.
 		if ( 'settings_page_wp_auto_featured_image' === get_current_screen()->id ) {
 			// Enqueue necessary scripts and styles for media upload.
 			wp_enqueue_script( 'jquery' );
+			wp_enqueue_style( 'select2-css' );
+			wp_enqueue_script( 'select2-js' );
 			wp_enqueue_script( 'media-upload' );
 			wp_enqueue_media();
 
@@ -180,13 +186,6 @@ class WPAFI_Admin {
 					'upgrade_text'       => esc_html__( 'Upgrade to add more', 'sny-auto-featured-image' ),
 				)
 			);
-
-			// Enqueue Select2 CSS from CDN.
-			wp_enqueue_style( 'select2-css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
-
-			// Enqueue jQuery and Select2 JS from CDN.
-			wp_enqueue_script( 'jquery' );
-			wp_enqueue_script( 'select2-js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
 		}
 	}
 
@@ -707,50 +706,103 @@ class WPAFI_Admin {
 			wp_send_json_error( array( 'message' => 'No settings configured' ) );
 		}
 
-		// Get posts without featured images.
-		$post_types = ! empty( $options['wpafi_post_type'] ) ? $options['wpafi_post_type'] : array( 'post' );
+		$rule_idx = isset( $_POST['rule_idx'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_idx'] ) ) : 'all';
+		$updated  = 0;
+		$failed   = 0;
 
-		$args = array(
-			'post_type'      => $post_types,
-			'post_status'    => 'publish',
-			'posts_per_page' => -1,
-			'meta_query'     => array(
-				array(
-					'key'     => '_thumbnail_id',
-					'compare' => 'NOT EXISTS',
-				),
-			),
-		);
-
-		// If overwrite is enabled, include posts with thumbnails too.
-		if ( ! empty( $options['wpafi_overwrite'] ) ) {
-			unset( $args['meta_query'] );
+		// Determine target rules.
+		$target_rules = array();
+		if ( 'all' === $rule_idx ) {
+			$target_rules = ! empty( $options['wpafi_rules'] ) ? $options['wpafi_rules'] : array();
+		} elseif ( is_numeric( $rule_idx ) && isset( $options['wpafi_rules'][ $rule_idx ] ) ) {
+			$target_rules = array( $options['wpafi_rules'][ $rule_idx ] );
 		}
 
-		$posts   = get_posts( $args );
-		$updated = 0;
-		$failed  = 0;
-
-		foreach ( $posts as $post ) {
-			if ( ! $this->is_post_meeting_criteria( $post->ID, $options ) ) {
-				continue;
+		// Get all public post types if using multiple rules, or specific ones if using one rule.
+		$target_post_types = array();
+		if ( ! empty( $target_rules ) ) {
+			foreach ( $target_rules as $rule ) {
+				$rule_pts = ! empty( $rule['post_types'] ) ? (array) $rule['post_types'] : array();
+				if ( empty( $rule_pts ) ) {
+					// Rule with no post type targets all public types.
+					$target_post_types = get_post_types( array( 'public' => true ), 'names' );
+					break;
+				}
+				$target_post_types = array_merge( $target_post_types, $rule_pts );
 			}
+		} else {
+			// Legacy fallback.
+			$target_post_types = ! empty( $options['wpafi_post_type'] ) ? $options['wpafi_post_type'] : array( 'post' );
+		}
+		$target_post_types = array_unique( $target_post_types );
 
+		$args = array(
+			'post_type'      => $target_post_types,
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		);
+
+		$post_ids = get_posts( $args );
+
+		foreach ( $post_ids as $post_id ) {
 			$image_id = null;
+			$matched  = false;
 
-			// Try auto-detect first.
-			if ( ! empty( $options['wpafi_auto_detect'] ) ) {
-				$image_id = $this->get_first_image_from_content( $post->ID );
+			// Try to find a matching rule.
+			if ( ! empty( $target_rules ) ) {
+				foreach ( $target_rules as $rule ) {
+					// Check if post meets rule criteria.
+					if ( ! $this->does_rule_match( $post_id, $rule ) ) {
+						continue;
+					}
+
+					// If post already has thumb, only proceed if rule allows overwrite.
+					if ( has_post_thumbnail( $post_id ) && empty( $rule['overwrite'] ) ) {
+						continue;
+					}
+
+					// Get image based on source.
+					$source = isset( $rule['image_source'] ) ? $rule['image_source'] : 'media';
+					switch ( $source ) {
+						case 'first_image':
+							$image_id = $this->get_first_image_from_content( $post_id );
+							break;
+						case 'external':
+							if ( ! empty( $rule['external_url'] ) ) {
+								$image_id = $this->sideload_image( $rule['external_url'], $post_id );
+							}
+							break;
+						case 'media':
+						default:
+							$image_id = ! empty( $rule['image_id'] ) ? intval( $rule['image_id'] ) : null;
+							break;
+					}
+
+					if ( $image_id ) {
+						$matched = true;
+						break;
+					}
+				}
 			}
 
-			// Fall back to default.
-			if ( ! $image_id && ! empty( $options['wpafi_default_thumb_id'] ) ) {
-				$image_id = $options['wpafi_default_thumb_id'];
+			// Global fallback (if no rules match or no rules defined).
+			if ( ! $matched && 'all' === $rule_idx ) {
+				if ( $this->is_post_meeting_criteria( $post_id, $options ) ) {
+					$global_overwrite = ! empty( $options['wpafi_overwrite'] );
+					if ( ! has_post_thumbnail( $post_id ) || $global_overwrite ) {
+						if ( ! empty( $options['wpafi_auto_detect'] ) ) {
+							$image_id = $this->get_first_image_from_content( $post_id );
+						}
+						if ( ! $image_id && ! empty( $options['wpafi_default_thumb_id'] ) ) {
+							$image_id = $options['wpafi_default_thumb_id'];
+						}
+					}
+				}
 			}
 
 			if ( $image_id ) {
-				$result = set_post_thumbnail( $post->ID, $image_id );
-				if ( $result ) {
+				if ( set_post_thumbnail( $post_id, $image_id ) ) {
 					++$updated;
 				} else {
 					++$failed;

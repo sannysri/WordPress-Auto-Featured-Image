@@ -148,7 +148,7 @@ class WPAFI_Settings {
 		 * @var array
 		 */
 		$post_types = get_post_types( array( 'public' => true ), 'names' );
-		echo '<select  class="wpafi-select" id="wpafi-multiselect" name="wpafi_options[wpafi_post_type][]" multiple="multiple">';
+		echo '<select  class="wpafi-select2" id="wpafi-multiselect" name="wpafi_options[wpafi_post_type][]" multiple="multiple">';
 		foreach ( $post_types as $post_type ) {
 			if ( 'attachment' !== $post_type ) {
 				$selected = '';
@@ -176,7 +176,7 @@ class WPAFI_Settings {
 			)
 		);
 
-		echo '<select class="wpafi-select" id="wpafi-category-multiselect" name="wpafi_options[wpafi_categories][]" multiple="multiple">';
+		echo '<select class="wpafi-select2" id="wpafi-category-multiselect" name="wpafi_options[wpafi_categories][]" multiple="multiple">';
 		foreach ( $wpafi_cats as $wpafi_cat ) {
 
 			$selected = '';
@@ -195,7 +195,7 @@ class WPAFI_Settings {
 		$options = get_option( 'wpafi_options' );
 		$tags    = get_tags();
 
-		echo '<select id="wpafi-tag-multiselect" class="wpafi-select"  name="wpafi_options[wpafi_tags][]" multiple="multiple">';
+		echo '<select id="wpafi-tag-multiselect" class="wpafi-select2"  name="wpafi_options[wpafi_tags][]" multiple="multiple">';
 		foreach ( $tags as $tag ) {
 			$selected = in_array( $tag->slug, $options['wpafi_tags'], true ) ? ' selected="selected"' : '';
 			echo '<option value="' . esc_attr( $tag->slug ) . '"' . esc_attr( $selected ) . '>' . esc_attr( $tag->name ) . '</option>';

@@ -112,21 +112,26 @@ jQuery(document).ready(function ($) {
 		wpafi.toast('Image removed', 'warning');
 	});
 
-	// ============================================
-	// Select2 Initialization
-	// ============================================
+	function initSelect2(force = false) {
+		$('.wpafi-select2').each(function () {
+			const $this = $(this);
+			if (force && $this.hasClass('select2-hidden-accessible')) {
+				$this.select2('destroy');
+			}
 
-	$('.wpafi-select').select2({
-		placeholder: 'Select options',
-		allowClear: true,
-	});
+			if (!$this.hasClass('select2-hidden-accessible')) {
+				const isBulk = $this.attr('id') === 'wpafi-bulk-rule';
+				$this.select2({
+					placeholder: isBulk ? 'Select a rule' : 'Select options',
+					allowClear: !isBulk,
+					width: isBulk ? '100%' : 'resolve',
+					dropdownAutoWidth: true,
+				});
+			}
+		});
+	}
 
-	// Initialize Select2 on bulk dropdown.
-	$('.wpafi-bulk-select2').select2({
-		placeholder: 'Select a rule',
-		allowClear: false,
-		width: '300px',
-	});
+	initSelect2();
 
 	// ============================================
 	// Convert Settings Errors to Toast
@@ -215,6 +220,7 @@ jQuery(document).ready(function ($) {
 			data: {
 				action: 'wpafi_bulk_assign',
 				nonce: wpafi_vars.bulk_nonce,
+				rule_idx: $('#wpafi-bulk-rule').val(),
 			},
 			success(response) {
 				clearInterval(progressInterval);
@@ -297,17 +303,8 @@ jQuery(document).ready(function ($) {
 
 	// Initialize Select2 on existing rules.
 	function initRuleSelect2() {
-		$('.wpafi-select2').each(function () {
-			if (!$(this).hasClass('select2-hidden-accessible')) {
-				$(this).select2({
-					placeholder: 'Select...',
-					allowClear: true,
-					width: '100%',
-				});
-			}
-		});
+		initSelect2();
 	}
-	initRuleSelect2();
 
 	// Add Rule button handler.
 	$('#wpafi-add-rule').on('click', function (e) {
@@ -558,6 +555,13 @@ jQuery(document).ready(function ($) {
 		// Update tab panels.
 		$('.wpafi-tab-panel').removeClass('active');
 		$('#wpafi-tab-' + tabId).addClass('active');
+
+		// Re-initialize Select2 if it's the bulk tab or settings tab (ensures correct width/display).
+		if (tabId === 'bulk' || tabId === 'settings') {
+			setTimeout(() => {
+				initSelect2(true);
+			}, 50);
+		}
 	});
 
 	// Update bulk rule dropdown when rules change.
@@ -582,6 +586,9 @@ jQuery(document).ready(function ($) {
 		if ($dropdown.find('option[value="' + currentVal + '"]').length) {
 			$dropdown.val(currentVal);
 		}
+
+		// Notify Select2 of the change.
+		$dropdown.trigger('change');
 	}
 
 	// Update dropdown on rule name change.

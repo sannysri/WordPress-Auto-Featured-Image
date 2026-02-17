@@ -236,7 +236,7 @@ $post_statuses    = array(
 							<div class="wpafi-bulk-rule-select">
 								<label
 									for="wpafi-bulk-rule"><?php esc_html_e( 'Apply Rule:', 'sny-auto-featured-image' ); ?></label>
-								<select id="wpafi-bulk-rule" class="wpafi-bulk-select2">
+								<select id="wpafi-bulk-rule" class="wpafi-select2">
 									<option value="all">
 										<?php esc_html_e( 'All Rules (in order)', 'sny-auto-featured-image' ); ?>
 									</option>
