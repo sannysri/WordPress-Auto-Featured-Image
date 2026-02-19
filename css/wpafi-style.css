@@ -11,9 +11,9 @@
    ========================================================================== */
 
 :root {
-	--wpafi-primary: #9b7bc0;
-	--wpafi-primary-hover: #8a6ab0;
-	--wpafi-primary-dark: #7c5ba0;
+	--wpafi-primary: #8b6bb0;
+	--wpafi-primary-hover: #7a5a9f;
+	--wpafi-primary-dark: #6b4a8f;
 	--wpafi-success: #00a32a;
 	--wpafi-warning: #dba617;
 	--wpafi-error: #d63638;
@@ -25,14 +25,14 @@
 	--wpafi-bg-light: #f6f7f7;
 	--wpafi-card-bg: #ffffff;
 	--wpafi-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	--wpafi-toggle-on: #9b7bc0;
+	--wpafi-toggle-on: #8b6bb0;
 	--wpafi-toggle-off: #c3c4c7;
 	--wpafi-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
-	--wpafi-shadow-pro: 0 4px 15px rgba(155, 123, 192, 0.4);
+	--wpafi-shadow-pro: 0 4px 15px rgba(107, 74, 143, 0.4);
 	--wpafi-radius: 8px;
 	--wpafi-radius-sm: 4px;
-	--wpafi-pro-color: #9b7bc0;
-	--wpafi-pro-gradient: linear-gradient(135deg, #9b7bc0 0%, #7c5ba0 100%);
+	--wpafi-pro-color: #6b4a8f;
+	--wpafi-pro-gradient: linear-gradient(135deg, #8b6bb0 0%, #6b4a8f 100%);
 
 	--wpafi-warning-bg: #fff8e5;
 	--wpafi-warning-border: #f0c33c;
@@ -41,13 +41,20 @@
 	/* Button tokens */
 	--wpafi-btn-transition: all 0.2s ease;
 	--wpafi-btn-hover-lift: translateY(-2px);
-	--wpafi-btn-shadow: 0 2px 6px rgba(155, 123, 192, 0.3);
-	--wpafi-btn-shadow-hover: 0 4px 12px rgba(155, 123, 192, 0.4);
+	--wpafi-btn-shadow: 0 2px 6px rgba(107, 74, 143, 0.3);
+	--wpafi-btn-shadow-hover: 0 4px 12px rgba(107, 74, 143, 0.4);
 }
 
 /* ==========================================================================
    Layout Structure
    ========================================================================== */
+
+/* Prevent horizontal scroll on settings page */
+.settings_page_wp_auto_featured_image #wpcontent,
+.settings_page_wp_auto_featured_image #wpbody,
+.settings_page_wp_auto_featured_image #wpbody-content {
+	overflow-x: hidden;
+}
 
 /* Ensure all elements use border-box sizing */
 .wpafi-settings-wrap,
@@ -156,20 +163,22 @@
 
 .wpafi-settings-wrap {
 	max-width: 1200px;
-	margin: 20px auto 40px 0;
+	margin: 20px 20px 40px 0;
 	overflow-x: hidden;
 }
 
 .wpafi-content {
 	display: grid;
-	grid-template-columns: 1fr 320px;
+	grid-template-columns: minmax(0, 1fr) 320px;
 	gap: 24px;
 	align-items: start;
 	max-width: 100%;
+	overflow: hidden;
 }
 
 .wpafi-main {
 	min-width: 0;
+	max-width: 100%;
 	overflow: hidden;
 }
 
@@ -276,6 +285,7 @@
 
 .wpafi-tab-panel {
 	display: none;
+	overflow-x: hidden;
 }
 
 .wpafi-tab-panel.active {
@@ -467,10 +477,14 @@
 	text-align: center;
 	font-weight: 600;
 	border: none !important;
+	transition: var(--wpafi-btn-transition);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .wpafi-pro-cta:hover {
-	background: rgba(255, 255, 255, 0.9) !important;
+	background: #fff !important;
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .wpafi-pro-price {
@@ -1999,6 +2013,14 @@
 		flex-wrap: wrap;
 	}
 
+	.wpafi-column-settings {
+		grid-template-columns: 1fr;
+	}
+
+	.wpafi-column-settings .wpafi-column-preview {
+		grid-column: span 1;
+	}
+
 	.wpafi-tab {
 		padding: 10px 14px;
 		font-size: 13px;
@@ -2101,6 +2123,8 @@
 	background: var(--wpafi-bg-light);
 	border-radius: var(--wpafi-radius);
 	border: 1px solid var(--wpafi-border-light);
+	max-width: 100%;
+	overflow: hidden;
 }
 
 .wpafi-column-settings .wpafi-condition-row {
@@ -2455,13 +2479,13 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	transition: all 0.3s ease;
-	box-shadow: var(--wpafi-shadow-pro);
+	transition: var(--wpafi-btn-transition);
+	box-shadow: var(--wpafi-btn-shadow);
 }
 
 .wpafi-pro-showcase-cta .button:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--wpafi-shadow-pro);
+	transform: var(--wpafi-btn-hover-lift);
+	box-shadow: var(--wpafi-btn-shadow-hover);
 	color: #fff;
 }
 
