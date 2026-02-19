@@ -114,6 +114,8 @@ class WPAFI_Settings {
 					'tags'              => isset( $rule['tags'] ) ? array_map( 'sanitize_text_field', (array) $rule['tags'] ) : array(),
 					'post_statuses'     => isset( $rule['post_statuses'] ) ? array_map( 'sanitize_text_field', (array) $rule['post_statuses'] ) : array(),
 					'overwrite'         => isset( $rule['overwrite'] ) ? 1 : 0,
+					'enabled'           => isset( $rule['enabled'] ) ? 1 : 0,
+					'collapsed'         => isset( $rule['collapsed'] ) ? 1 : 0,
 				);
 				++$rule_count;
 			}

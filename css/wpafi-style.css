@@ -17,14 +17,16 @@
 	--wpafi-success: #00a32a;
 	--wpafi-warning: #dba617;
 	--wpafi-error: #d63638;
+	--wpafi-text: #1d2327;
+	--wpafi-text-secondary: #646970;
 	--wpafi-border: #c3c4c7;
-	--wpafi-border-light: #e0e0e0;
+	--wpafi-border-light: #dcdcde;
 	--wpafi-bg: #f0f0f1;
-	--wpafi-bg-light: #f8f9fa;
-	--wpafi-card-bg: #fff;
-	--wpafi-text: #1e1e1e;
-	--wpafi-text-secondary: #757575;
+	--wpafi-bg-light: #f6f7f7;
+	--wpafi-card-bg: #ffffff;
 	--wpafi-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	--wpafi-toggle-on: #9b7bc0;
+	--wpafi-toggle-off: #c3c4c7;
 	--wpafi-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
 	--wpafi-shadow-pro: 0 4px 15px rgba(155, 123, 192, 0.4);
 	--wpafi-radius: 8px;
@@ -325,6 +327,67 @@
    Cards
    ========================================================================== */
 
+.wpafi-rule-card {
+	background: var(--wpafi-card-bg);
+	border: 1px solid var(--wpafi-border);
+	border-radius: var(--wpafi-radius);
+	margin-bottom: 20px;
+	box-shadow: var(--wpafi-shadow);
+	overflow: hidden;
+	transition: all 0.2s ease;
+}
+
+.wpafi-rule-card.is-disabled {
+	opacity: 0.7;
+	filter: grayscale(0.5);
+}
+
+.wpafi-rule-card.is-disabled .wpafi-rule-card-body {
+	pointer-events: none;
+}
+
+.wpafi-rule-card-header {
+	padding: 12px 20px;
+	background: var(--wpafi-bg-light);
+	border-bottom: 1px solid var(--wpafi-border-light);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+	user-select: none;
+}
+
+.wpafi-rule-header-left {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	flex: 1;
+}
+
+.wpafi-rule-header-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.wpafi-rule-collapse-btn {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	color: var(--wpafi-text-secondary);
+	display: flex;
+	align-items: center;
+	transition: transform 0.2s ease;
+}
+
+.is-collapsed .wpafi-rule-collapse-btn {
+	transform: rotate(-90deg);
+}
+
+.is-collapsed .wpafi-rule-card-body {
+	display: none;
+}
 .wpafi-card {
 	margin-bottom: 20px;
 	background: var(--wpafi-card-bg);
@@ -1352,6 +1415,57 @@
 	max-width: 300px;
 	color: var(--wpafi-text-secondary);
 	font-size: 14px;
+}
+
+/* Modern Toggle Switch */
+.wpafi-toggle {
+	position: relative;
+	display: inline-block;
+	width: 36px;
+	height: 20px;
+	margin: 0;
+	cursor: pointer;
+}
+
+.wpafi-toggle input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.wpafi-toggle-slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--wpafi-toggle-off);
+	transition: .3s;
+	border-radius: 20px;
+}
+
+.wpafi-toggle-slider:before {
+	position: absolute;
+	content: "";
+	height: 14px;
+	width: 14px;
+	left: 3px;
+	bottom: 3px;
+	transition: .3s;
+	border-radius: 50%;
+}
+
+.wpafi-toggle input:checked + .wpafi-toggle-slider {
+	background-color: var(--wpafi-toggle-on);
+}
+
+.wpafi-toggle input:focus + .wpafi-toggle-slider {
+	box-shadow: 0 0 1px var(--wpafi-toggle-on);
+}
+
+.wpafi-toggle input:checked + .wpafi-toggle-slider:before {
+	transform: translateX(16px);
 }
 
 /* Rule Behavior Options */

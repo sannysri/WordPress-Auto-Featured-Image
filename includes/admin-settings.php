@@ -413,6 +413,12 @@ $post_statuses    = array(
 									<li><strong><?php esc_html_e( 'Post Status:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Apply to published, draft, pending, or scheduled posts', 'sny-auto-featured-image' ); ?></li>
 								</ul>
 
+								<h3><?php esc_html_e( 'Rule Management', 'sny-auto-featured-image' ); ?></h3>
+								<ul>
+									<li><strong><?php esc_html_e( 'Enable/Disable:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Use the toggle switch in the rule header to quickly turn a rule on or off without deleting it. Disabled rules are skipped during processing.', 'sny-auto-featured-image' ); ?></li>
+									<li><strong><?php esc_html_e( 'Collapsible Cards:', 'sny-auto-featured-image' ); ?></strong> <?php esc_html_e( 'Click on a rule header to collapse it. This helps keep your workspace organized when managing multiple rules.', 'sny-auto-featured-image' ); ?></li>
+								</ul>
+
 								<h3><?php esc_html_e( 'Example Use Cases', 'sny-auto-featured-image' ); ?></h3>
 								<ul>
 									<li><?php esc_html_e( 'Set a "News" category image for all news posts', 'sny-auto-featured-image' ); ?></li>
@@ -744,10 +750,28 @@ function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_
 	$sideload_external = isset( $rule['sideload_external'] ) ? $rule['sideload_external'] : 1;
 	$rule_number       = is_numeric( $index ) ? intval( $index ) + 1 : '?';
 	$rule_name         = isset( $rule['name'] ) ? $rule['name'] : '';
+	$is_enabled        = isset( $rule['enabled'] ) ? (bool) $rule['enabled'] : true;
+	// Force collapse if disabled, otherwise check saved state.
+	$is_collapsed      = ! $is_enabled || ( isset( $rule['collapsed'] ) && (bool) $rule['collapsed'] );
+
+	$card_classes = array( 'wpafi-rule-card' );
+	if ( ! $is_enabled ) {
+		$card_classes[] = 'is-disabled';
+	}
+	if ( $is_collapsed ) {
+		$card_classes[] = 'is-collapsed';
+	}
 	?>
-<div class="wpafi-rule-card" data-index="<?php echo esc_attr( $index ); ?>">
+<div class="<?php echo esc_attr( implode( ' ', $card_classes ) ); ?>" data-index="<?php echo esc_attr( $index ); ?>">
+	<input type="hidden" name="wpafi_options[wpafi_rules][<?php echo esc_attr( $index ); ?>][collapsed]"
+		class="wpafi-rule-collapsed-state" value="<?php echo $is_collapsed ? '1' : '0'; ?>" />
+
 	<div class="wpafi-rule-card-header">
 		<div class="wpafi-rule-header-left">
+			<button type="button" class="wpafi-rule-collapse-btn"
+				title="<?php esc_attr_e( 'Toggle Collapse', 'sny-auto-featured-image' ); ?>">
+				<span class="dashicons dashicons-arrow-down-alt2"></span>
+			</button>
 			<span class="wpafi-rule-number">
 				<span class="dashicons dashicons-format-image"></span>
 				<?php
@@ -759,12 +783,19 @@ function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_
 				class="wpafi-rule-name" value="<?php echo esc_attr( $rule_name ); ?>"
 				placeholder="<?php esc_attr_e( 'Rule name (optional)', 'sny-auto-featured-image' ); ?>" />
 		</div>
-		<?php if ( 0 !== $index && '0' !== $index ) : ?>
-		<button type="button" class="wpafi-remove-rule"
-			title="<?php esc_attr_e( 'Remove Rule', 'sny-auto-featured-image' ); ?>">
-			<span class="dashicons dashicons-trash"></span>
-		</button>
-		<?php endif; ?>
+		<div class="wpafi-rule-header-actions">
+			<label class="wpafi-toggle" title="<?php esc_attr_e( 'Enable/Disable Rule', 'sny-auto-featured-image' ); ?>">
+				<input type="checkbox" name="wpafi_options[wpafi_rules][<?php echo esc_attr( $index ); ?>][enabled]"
+					class="wpafi-rule-enabled-toggle" value="1" <?php checked( $is_enabled ); ?> />
+				<span class="wpafi-toggle-slider"></span>
+			</label>
+			<?php if ( 0 !== $index && '0' !== $index ) : ?>
+			<button type="button" class="wpafi-remove-rule"
+				title="<?php esc_attr_e( 'Remove Rule', 'sny-auto-featured-image' ); ?>">
+				<span class="dashicons dashicons-trash"></span>
+			</button>
+			<?php endif; ?>
+		</div>
 	</div>
 	<div class="wpafi-rule-card-body">
 		<!-- Image Source Selection -->

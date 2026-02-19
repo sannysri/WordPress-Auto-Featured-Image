@@ -216,6 +216,11 @@ class WPAFI_Admin {
 		// Check conditional rules (first matching rule wins).
 		if ( ! empty( $options['wpafi_rules'] ) && is_array( $options['wpafi_rules'] ) ) {
 			foreach ( $options['wpafi_rules'] as $rule ) {
+				// Skip if rule is disabled.
+				if ( isset( $rule['enabled'] ) && ! $rule['enabled'] ) {
+					continue;
+				}
+
 				// Check if post already has thumbnail and rule doesn't allow overwrite.
 				$rule_overwrite = ! empty( $rule['overwrite'] );
 				if ( has_post_thumbnail( $post_id ) && ! $rule_overwrite ) {
@@ -752,6 +757,11 @@ class WPAFI_Admin {
 			// Try to find a matching rule.
 			if ( ! empty( $target_rules ) ) {
 				foreach ( $target_rules as $rule ) {
+					// Skip if rule is disabled.
+					if ( isset( $rule['enabled'] ) && ! $rule['enabled'] ) {
+						continue;
+					}
+
 					// Check if post meets rule criteria.
 					if ( ! $this->does_rule_match( $post_id, $rule ) ) {
 						continue;

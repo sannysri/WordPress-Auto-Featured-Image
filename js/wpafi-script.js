@@ -345,6 +345,11 @@ jQuery(document).ready(function ($) {
 
 		updateAddRuleButton();
 		updateRuleLimitText();
+
+		// New rules should start expanded.
+		$('#wpafi-rules-container .wpafi-rule-card').last().removeClass('is-collapsed');
+		$('#wpafi-rules-container .wpafi-rule-card').last().find('.wpafi-rule-collapsed-state').val('0');
+
 		wpafi.toast('New rule added', 'success');
 	});
 
@@ -537,6 +542,67 @@ jQuery(document).ready(function ($) {
 			}
 		}
 	);
+
+	// ============================================
+	// Rule Card Collapsible & Toggle
+	// ============================================
+
+	// Toggle card collapse.
+	$(document).on(
+		'click',
+		'.wpafi-rule-card-header',
+		function (e) {
+			// Don't collapse if clicking inputs/buttons inside header.
+			if (
+				$(e.target).closest(
+					'.wpafi-rule-name, .wpafi-rule-header-actions, .wpafi-toggle'
+				).length
+			) {
+				return;
+			}
+
+			const $card = $(this).closest('.wpafi-rule-card');
+			const $stateInput = $card.find('.wpafi-rule-collapsed-state');
+			const isCollapsed = $card.hasClass('is-collapsed');
+			const isDisabled = $card.hasClass('is-disabled');
+
+			// If disabled, don't allow expanding, but allow collapsing.
+			if (isDisabled && isCollapsed) {
+				wpafi.toast('Please enable the rule first to edit it', 'warning');
+				return;
+			}
+
+			if (isCollapsed) {
+				$card.removeClass('is-collapsed');
+				$stateInput.val('0');
+			} else {
+				$card.addClass('is-collapsed');
+				$stateInput.val('1');
+			}
+		}
+	);
+
+	// Toggle card enabled/disabled.
+	$(document).on('change', '.wpafi-rule-enabled-toggle', function () {
+		const $card = $(this).closest('.wpafi-rule-card');
+		const $stateInput = $card.find('.wpafi-rule-collapsed-state');
+		const isEnabled = $(this).is(':checked');
+
+		if (isEnabled) {
+			$card.removeClass('is-disabled');
+			$card.removeClass('is-collapsed');
+			$stateInput.val('0');
+			wpafi.toast('Rule enabled', 'success');
+		} else {
+			$card.addClass('is-disabled');
+			$card.addClass('is-collapsed');
+			$stateInput.val('1');
+			wpafi.toast('Rule disabled', 'warning');
+		}
+
+		// Update bulk rule dropdown sync.
+		updateBulkRuleDropdown();
+	});
 
 	// Initialize rule button state.
 	updateAddRuleButton();
