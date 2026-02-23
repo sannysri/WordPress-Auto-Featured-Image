@@ -54,6 +54,47 @@ $post_statuses    = array(
 		<?php endif; ?>
 	</div>
 
+	<?php
+	// Display promotional offer banner if active.
+	$offer = function_exists( 'wpafi_get_offer' ) ? wpafi_get_offer() : null;
+	if ( $offer ) :
+		?>
+	<div class="wpafi-offer-banner" data-offer-type="<?php echo esc_attr( $offer['type'] ); ?>">
+		<div class="wpafi-offer-content">
+			<?php if ( ! empty( $offer['badge'] ) ) : ?>
+			<span class="wpafi-offer-badge"><?php echo esc_html( $offer['badge'] ); ?></span>
+			<?php endif; ?>
+			<div class="wpafi-offer-text">
+				<?php if ( ! empty( $offer['title'] ) ) : ?>
+				<strong class="wpafi-offer-title"><?php echo esc_html( $offer['title'] ); ?></strong>
+				<?php endif; ?>
+				<?php if ( ! empty( $offer['message'] ) ) : ?>
+				<span class="wpafi-offer-message"><?php echo esc_html( $offer['message'] ); ?></span>
+				<?php endif; ?>
+			</div>
+			<?php if ( $offer['type'] === 'limited' && ! empty( $offer['remaining'] ) ) : ?>
+			<span class="wpafi-offer-remaining">
+				<span class="wpafi-offer-remaining-count"><?php echo absint( $offer['remaining'] ); ?></span>
+				<?php esc_html_e( 'left', 'sny-auto-featured-image' ); ?>
+			</span>
+			<?php endif; ?>
+			<?php if ( ! empty( $offer['countdown'] ) ) : ?>
+			<span class="wpafi-offer-countdown" data-countdown="<?php echo esc_attr( $offer['countdown'] ); ?>">
+				<span class="wpafi-countdown-timer"></span>
+			</span>
+			<?php endif; ?>
+		</div>
+		<a href="<?php echo esc_url( function_exists( 'wpafi_get_offer_url' ) ? wpafi_get_offer_url() : '#' ); ?>"
+			class="wpafi-offer-cta" target="_blank">
+			<?php echo esc_html( $offer['cta_text'] ); ?>
+			<span class="dashicons dashicons-arrow-right-alt"></span>
+		</a>
+		<button type="button" class="wpafi-offer-dismiss" aria-label="<?php esc_attr_e( 'Dismiss offer', 'sny-auto-featured-image' ); ?>">
+			<span class="dashicons dashicons-no-alt"></span>
+		</button>
+	</div>
+	<?php endif; ?>
+
 	<!-- Toast Container -->
 	<div id="wpafi-toast-container"></div>
 

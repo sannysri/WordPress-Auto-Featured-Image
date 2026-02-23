@@ -717,4 +717,100 @@ jQuery(document).ready(function ($) {
 
 		return true;
 	});
+
+	// ==========================================================================
+	// Promotional Offer Banner
+	// ==========================================================================
+
+	/**
+	 * Initialize offer banner functionality
+	 */
+	function initOfferBanner() {
+		const $banner = $('.wpafi-offer-banner');
+		if (!$banner.length) {
+			return;
+		}
+
+		// Check if offer was previously dismissed (session-based).
+		const dismissedKey = 'wpafi_offer_dismissed';
+		// TESTING: Disabled session check - uncomment for production
+		// if (sessionStorage.getItem(dismissedKey)) {
+		// 	$banner.remove();
+		// 	return;
+		// }
+
+		// Handle dismiss button - TESTING: Disabled for testing
+		/*
+		$banner.on('click', '.wpafi-offer-dismiss', function (e) {
+			e.preventDefault();
+			$banner.addClass('dismissed');
+			sessionStorage.setItem(dismissedKey, '1');
+
+			// Remove from DOM after animation.
+			setTimeout(function () {
+				$banner.remove();
+			}, 300);
+		});
+		*/
+
+		// Initialize countdown timer if present.
+		const $countdown = $banner.find('.wpafi-offer-countdown');
+		if ($countdown.length) {
+			const endTime = $countdown.data('countdown');
+			if (endTime) {
+				initCountdownTimer($countdown.find('.wpafi-countdown-timer'), endTime);
+			}
+		}
+	}
+
+	/**
+	 * Initialize countdown timer
+	 *
+	 * @param {jQuery} $element Timer element.
+	 * @param {string} endTime  ISO 8601 datetime string.
+	 */
+	function initCountdownTimer($element, endTime) {
+		const end = new Date(endTime).getTime();
+
+		function updateTimer() {
+			const now = new Date().getTime();
+			const distance = end - now;
+
+			// If countdown finished.
+			if (distance < 0) {
+				$element.text('Expired');
+				$element.closest('.wpafi-offer-banner').addClass('dismissed');
+				setTimeout(function () {
+					$element.closest('.wpafi-offer-banner').remove();
+				}, 300);
+				return;
+			}
+
+			// Calculate time units.
+			const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+			const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+			const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+			const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+			// Format display.
+			let display = '';
+			if (days > 0) {
+				display = days + 'd ' + hours + 'h ' + minutes + 'm';
+			} else if (hours > 0) {
+				display = hours + 'h ' + minutes + 'm ' + seconds + 's';
+			} else {
+				display = minutes + 'm ' + seconds + 's';
+			}
+
+			$element.text(display);
+
+			// Update every second.
+			setTimeout(updateTimer, 1000);
+		}
+
+		updateTimer();
+	}
+
+	// Initialize offer banner.
+	initOfferBanner();
 });

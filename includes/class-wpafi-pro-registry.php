@@ -128,14 +128,21 @@ class WPAFI_Pro_Registry {
 	 * Fetch registry data from API
 	 */
 	private function fetch_from_api() {
+		$args = array(
+			'timeout' => 5,
+			'headers' => array(
+				'Accept' => 'application/json',
+			),
+		);
+
+		// Disable SSL verification for local development with custom API URL.
+		if ( defined( 'WPAFI_REGISTRY_API_URL' ) ) {
+			$args['sslverify'] = false;
+		}
+
 		$response = wp_remote_get(
 			$this->get_api_url() . self::PLUGIN_SLUG,
-			array(
-				'timeout' => 5,
-				'headers' => array(
-					'Accept' => 'application/json',
-				),
-			)
+			$args
 		);
 
 		// Handle errors gracefully.
@@ -216,8 +223,18 @@ class WPAFI_Pro_Registry {
 					'description' => 'Fast email support',
 				),
 			),
-			'upgrade_url'   => 'https://sanny.dev/plugins/auto-featured-image-pro/',
-			'is_fallback'   => true,
+			'upgrade_url'     => 'https://sanny.dev/plugins/auto-featured-image-pro/',
+			'is_fallback'     => true,
+			// Offer fields - default to inactive.
+			'offer_active'    => false,
+			'offer_type'      => '',
+			'offer_badge'     => '',
+			'offer_title'     => '',
+			'offer_message'   => '',
+			'offer_cta_text'  => '',
+			'offer_cta_url'   => '',
+			'offer_countdown' => '',
+			'offer_remaining' => 0,
 		);
 	}
 
@@ -279,6 +296,77 @@ class WPAFI_Pro_Registry {
 				'utm_source'   => sanitize_key( $source ),
 				'utm_medium'   => sanitize_key( $medium ),
 				'utm_campaign' => 'upsell',
+			),
+			$base_url
+		);
+	}
+
+	/**
+	 * Check if an offer is currently active
+	 *
+	 * @return bool
+	 */
+	public function has_active_offer() {
+		$data = $this->get_data();
+
+		// Check if offer is marked active.
+		if ( empty( $data['offer_active'] ) ) {
+			return false;
+		}
+
+		// Check if countdown has passed.
+		if ( ! empty( $data['offer_countdown'] ) ) {
+			$end_time = strtotime( $data['offer_countdown'] );
+			if ( $end_time && $end_time < time() ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get offer data
+	 *
+	 * @return array|null Offer data or null if no active offer.
+	 */
+	public function get_offer() {
+		if ( ! $this->has_active_offer() ) {
+			return null;
+		}
+
+		$data = $this->get_data();
+
+		return array(
+			'type'      => $data['offer_type'] ?? 'limited',
+			'badge'     => $data['offer_badge'] ?? '',
+			'title'     => $data['offer_title'] ?? '',
+			'message'   => $data['offer_message'] ?? '',
+			'cta_text'  => $data['offer_cta_text'] ?? __( 'Claim Offer', 'sny-auto-featured-image' ),
+			'cta_url'   => $data['offer_cta_url'] ?? $this->get_upgrade_url( 'offer' ),
+			'countdown' => $data['offer_countdown'] ?? '',
+			'remaining' => absint( $data['offer_remaining'] ?? 0 ),
+		);
+	}
+
+	/**
+	 * Get offer CTA URL with UTM tracking
+	 *
+	 * @return string
+	 */
+	public function get_offer_url() {
+		$data = $this->get_data();
+
+		// Use custom offer URL if set, otherwise fall back to upgrade URL.
+		$base_url = ! empty( $data['offer_cta_url'] )
+			? $data['offer_cta_url']
+			: ( $data['upgrade_url'] ?? 'https://sanny.dev/plugins/auto-featured-image-pro/' );
+
+		return add_query_arg(
+			array(
+				'utm_source'   => 'offer-banner',
+				'utm_medium'   => 'plugin',
+				'utm_campaign' => sanitize_key( $data['offer_type'] ?? 'limited' ) . '-offer',
 			),
 			$base_url
 		);

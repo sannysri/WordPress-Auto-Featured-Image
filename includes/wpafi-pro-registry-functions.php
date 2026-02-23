@@ -62,3 +62,43 @@ function wpafi_get_pro_price_text() {
 	$registry = WPAFI_Pro_Registry::get_instance();
 	return $registry->get_price_text();
 }
+
+/**
+ * Check if there's an active promotional offer
+ *
+ * @return bool
+ */
+function wpafi_has_active_offer() {
+	// Don't show offers if Pro is already installed.
+	if ( function_exists( 'wpafi_is_pro_active' ) && wpafi_is_pro_active() ) {
+		return false;
+	}
+
+	$registry = WPAFI_Pro_Registry::get_instance();
+	return $registry->has_active_offer();
+}
+
+/**
+ * Get current offer data
+ *
+ * @return array|null Offer data array or null if no active offer.
+ */
+function wpafi_get_offer() {
+	// Don't show offers if Pro is already installed.
+	if ( function_exists( 'wpafi_is_pro_active' ) && wpafi_is_pro_active() ) {
+		return null;
+	}
+
+	$registry = WPAFI_Pro_Registry::get_instance();
+	return $registry->get_offer();
+}
+
+/**
+ * Get offer CTA URL with tracking
+ *
+ * @return string
+ */
+function wpafi_get_offer_url() {
+	$registry = WPAFI_Pro_Registry::get_instance();
+	return $registry->get_offer_url();
+}

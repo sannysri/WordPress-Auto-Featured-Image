@@ -994,6 +994,367 @@
 }
 
 /* ==========================================================================
+   Promotional Offer Banner
+   ========================================================================== */
+
+.wpafi-offer-banner {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	margin-bottom: 24px;
+	padding: 20px 50px 20px 24px;
+	background: linear-gradient(135deg, #2d1b4e 0%, #4a2c7a 50%, #6b4a8f 100%);
+	border-radius: var(--wpafi-radius);
+	box-shadow: 
+		0 8px 32px rgba(107, 74, 143, 0.35),
+		0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+	position: relative;
+	overflow: hidden;
+	animation: wpafi-offer-slide-in 0.4s ease;
+}
+
+/* Premium shine effect */
+.wpafi-offer-banner::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 50%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent,
+		rgba(255, 255, 255, 0.15),
+		transparent
+	);
+}
+
+/* Golden accent border top */
+.wpafi-offer-banner::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(90deg, #f7b731, #ffd32a, #f7b731);
+	border-radius: var(--wpafi-radius-lg) var(--wpafi-radius-lg) 0 0;
+}
+
+.wpafi-offer-banner.dismissed {
+	animation: wpafi-offer-slide-out 0.3s ease forwards;
+}
+
+.wpafi-offer-content {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	flex: 1;
+	flex-wrap: wrap;
+	position: relative;
+	z-index: 1;
+}
+
+.wpafi-offer-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	background: linear-gradient(135deg, #f7b731 0%, #ffd32a 50%, #f7b731 100%);
+	color: #2d1b4e;
+	font-size: 14px;
+	font-weight: 800;
+	letter-spacing: 0.5px;
+	border-radius: 24px;
+	white-space: nowrap;
+	box-shadow: 
+		0 4px 15px rgba(247, 183, 49, 0.4),
+		0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+	/* TESTING: Disabled badge glow animation */
+	/* animation: wpafi-offer-badge-glow 2s ease-in-out infinite; */
+}
+
+.wpafi-offer-text {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.wpafi-offer-title {
+	color: #fff;
+	font-size: 17px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.wpafi-offer-message {
+	color: rgba(255, 255, 255, 0.9);
+	font-size: 14px;
+}
+
+.wpafi-offer-remaining {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 14px;
+	background: rgba(255, 255, 255, 0.15);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 20px;
+	color: #fff;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.wpafi-offer-remaining-count {
+	font-weight: 800;
+	font-size: 15px;
+	color: #7fff7f;
+	text-shadow: 0 0 10px rgba(127, 255, 127, 0.5);
+}
+
+.wpafi-offer-countdown {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 14px;
+	background: rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 20px;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+	/* TESTING: Disabled countdown pulse animation */
+	/* animation: wpafi-offer-countdown-pulse 1s ease-in-out infinite; */
+}
+
+.wpafi-offer-cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 24px;
+	background: linear-gradient(135deg, #f7b731 0%, #ffd32a 100%);
+	color: #2d1b4e;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	text-decoration: none;
+	border-radius: 25px;
+	white-space: nowrap;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 
+		0 4px 15px rgba(247, 183, 49, 0.4),
+		0 0 0 2px rgba(255, 255, 255, 0.1) inset;
+	position: relative;
+	z-index: 1;
+}
+
+.wpafi-offer-cta:hover {
+	color: #2d1b4e;
+	transform: translateY(-3px) scale(1.02);
+	box-shadow: 
+		0 12px 35px rgba(247, 183, 49, 0.6),
+		0 0 40px rgba(247, 183, 49, 0.3),
+		0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+}
+
+.wpafi-offer-cta:active {
+	transform: translateY(-1px) scale(1);
+}
+
+.wpafi-offer-cta .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.wpafi-offer-dismiss {
+	position: absolute;
+	top: 50%;
+	right: 14px;
+	transform: translateY(-50%);
+	background: rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	color: #fff;
+	cursor: pointer;
+	padding: 6px;
+	line-height: 1;
+	border-radius: 50%;
+	transition: all 0.2s ease;
+	z-index: 2;
+}
+
+.wpafi-offer-dismiss:hover {
+	background: rgba(255, 255, 255, 0.35);
+	color: #fff;
+	transform: translateY(-50%) scale(1.1);
+}
+
+.wpafi-offer-dismiss .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* Offer type variations */
+.wpafi-offer-banner[data-offer-type="seasonal"] {
+	background: linear-gradient(135deg, #1a4a2e 0%, #2d7a4a 50%, #3d9a5a 100%);
+}
+
+.wpafi-offer-banner[data-offer-type="seasonal"]::after {
+	background: linear-gradient(90deg, #4ade80, #22c55e, #4ade80);
+}
+
+.wpafi-offer-banner[data-offer-type="seasonal"] .wpafi-offer-badge {
+	background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+	color: #052e16;
+}
+
+.wpafi-offer-banner[data-offer-type="seasonal"] .wpafi-offer-cta {
+	background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+	color: #052e16;
+}
+
+.wpafi-offer-banner[data-offer-type="flash"] {
+	background: linear-gradient(135deg, #4a1a2e 0%, #7a2c4a 50%, #9a3d5a 100%);
+}
+
+.wpafi-offer-banner[data-offer-type="flash"]::after {
+	background: linear-gradient(90deg, #ff6b6b, #ee5a5a, #ff6b6b);
+	animation: wpafi-offer-border-flash 0.5s ease-in-out infinite alternate;
+}
+
+.wpafi-offer-banner[data-offer-type="flash"] .wpafi-offer-badge {
+	background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+	color: #fff;
+	animation: wpafi-offer-badge-flash 0.5s ease-in-out infinite alternate;
+}
+
+.wpafi-offer-banner[data-offer-type="flash"] .wpafi-offer-cta {
+	background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+	color: #fff;
+}
+
+@keyframes wpafi-offer-slide-in {
+	from {
+		opacity: 0;
+		transform: translateY(-15px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes wpafi-offer-slide-out {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+		max-height: 120px;
+		margin-bottom: 24px;
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-15px);
+		max-height: 0;
+		margin-bottom: 0;
+		padding: 0;
+		overflow: hidden;
+	}
+}
+
+@keyframes wpafi-offer-shine {
+	0% {
+		left: -100%;
+	}
+	50%, 100% {
+		left: 150%;
+	}
+}
+
+@keyframes wpafi-offer-badge-glow {
+	0%, 100% {
+		box-shadow: 
+			0 4px 15px rgba(247, 183, 49, 0.4),
+			0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+	}
+	50% {
+		box-shadow: 
+			0 4px 25px rgba(247, 183, 49, 0.6),
+			0 0 20px rgba(247, 183, 49, 0.3),
+			0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+	}
+}
+
+@keyframes wpafi-offer-countdown-pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+
+@keyframes wpafi-offer-badge-flash {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(1.05);
+	}
+}
+
+@keyframes wpafi-offer-border-flash {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0.6;
+	}
+}
+
+/* Responsive offer banner */
+@media (max-width: 782px) {
+	.wpafi-offer-banner {
+		flex-direction: column;
+		align-items: stretch;
+		text-align: center;
+		padding: 24px 20px 20px;
+		gap: 16px;
+	}
+
+	.wpafi-offer-content {
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.wpafi-offer-text {
+		align-items: center;
+	}
+
+	.wpafi-offer-cta {
+		justify-content: center;
+		width: 100%;
+		padding: 14px 24px;
+	}
+
+	.wpafi-offer-remaining,
+	.wpafi-offer-countdown {
+		font-size: 12px;
+		padding: 6px 12px;
+	}
+
+	.wpafi-offer-dismiss {
+		top: 8px;
+		right: 8px;
+	}
+}
+
+/* ==========================================================================
    Conditional Rules (ACF-style cards)
    ========================================================================== */
 
