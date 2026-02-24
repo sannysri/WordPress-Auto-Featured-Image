@@ -1,0 +1,17 @@
+parameters:
+	level: 5
+	paths:
+		- wp-auto-featured-image.php
+		- admin/
+		- includes/
+	excludePaths:
+		- vendor/
+		- tests/
+	ignoreErrors:
+		# WordPress functions accept mixed types
+		- '#Parameter .* of function esc_attr expects string, int given#'
+		- '#Constant WP_PLUGIN_URL not found#'
+
+# WordPress stubs for function/class definitions
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon

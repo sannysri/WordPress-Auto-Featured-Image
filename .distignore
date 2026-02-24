@@ -1,0 +1,47 @@
+# Distribution ignore file - files NOT deployed to WordPress.org SVN
+
+# Development dependencies
+/vendor/
+/node_modules/
+
+# Development configs
+.distignore
+.gitignore
+.gitattributes
+.editorconfig
+composer.json
+composer.lock
+package.json
+package-lock.json
+phpcs.xml.dist
+phpstan.neon
+phpunit.xml.dist
+
+# Tests
+/tests/
+/coverage/
+.phpunit.result.cache
+
+# CI/CD
+/.github/
+
+# Documentation
+CONTRIBUTING.md
+readme.md
+CODE_OF_CONDUCT.md
+
+# IDE
+/.idea/
+/.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/build/
+
+# Git
+.git/
+.gitmodules
