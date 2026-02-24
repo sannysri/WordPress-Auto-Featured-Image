@@ -191,12 +191,12 @@ class WPAFI_Pro_Registry {
 	 */
 	private function get_fallback_data() {
 		return array(
-			'slug'          => self::PLUGIN_SLUG,
-			'name'          => 'Auto Featured Image Pro',
-			'pro_available' => false, // Default to hidden when API unavailable.
-			'version'       => '1.0.0',
-			'price_text'    => '',
-			'features'      => array(
+			'slug'            => self::PLUGIN_SLUG,
+			'name'            => 'Auto Featured Image Pro',
+			'pro_available'   => false, // Default to hidden when API unavailable.
+			'version'         => '1.0.0',
+			'price_text'      => '',
+			'features'        => array(
 				array(
 					'icon'        => 'dashicons-images-alt2',
 					'title'       => 'AI Image Generation',

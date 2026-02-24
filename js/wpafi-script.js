@@ -219,7 +219,7 @@ jQuery(document).ready(function ($) {
 			data: {
 				action: 'wpafi_bulk_count',
 				nonce: wpafi_vars.bulk_nonce,
-				rule_idx: ruleIdx,
+				ruleIdx,
 			},
 			success(response) {
 				if (!response.success) {
@@ -306,8 +306,8 @@ jQuery(document).ready(function ($) {
 			data: {
 				action: 'wpafi_bulk_assign',
 				nonce: wpafi_vars.bulk_nonce,
-				rule_idx: ruleIdx,
-				offset: offset,
+				ruleIdx,
+				offset,
 				limit: BATCH_SIZE,
 			},
 			success(response) {
@@ -330,7 +330,11 @@ jQuery(document).ready(function ($) {
 				const progress = Math.round((data.processed / total) * 100);
 				wpafi.updateProgress(
 					progress,
-					'Processing ' + data.processed + ' of ' + total + ' posts...'
+					'Processing ' +
+						data.processed +
+						' of ' +
+						total +
+						' posts...'
 				);
 
 				if (data.has_more && !bulkState.cancelled) {
@@ -501,8 +505,13 @@ jQuery(document).ready(function ($) {
 		updateRuleLimitText();
 
 		// New rules should start expanded.
-		$('#wpafi-rules-container .wpafi-rule-card').last().removeClass('is-collapsed');
-		$('#wpafi-rules-container .wpafi-rule-card').last().find('.wpafi-rule-collapsed-state').val('0');
+		$('#wpafi-rules-container .wpafi-rule-card')
+			.last()
+			.removeClass('is-collapsed');
+		$('#wpafi-rules-container .wpafi-rule-card')
+			.last()
+			.find('.wpafi-rule-collapsed-state')
+			.val('0');
 
 		wpafi.toast('New rule added', 'success');
 	});
@@ -546,11 +555,6 @@ jQuery(document).ready(function ($) {
 		ruleIndex = $('#wpafi-rules-container .wpafi-rule-card').length;
 	}
 
-	// Legacy function name for compatibility.
-	function updateRuleNumbers() {
-		reindexAllRules();
-	}
-
 	// Update rule limit text.
 	function updateRuleLimitText() {
 		const currentRuleCount = $(
@@ -563,14 +567,13 @@ jQuery(document).ready(function ($) {
 			// At limit - show locked state with upgrade link (only if Pro teasers enabled).
 			if (!$limitElement.hasClass('wpafi-rule-limit-locked')) {
 				$limitElement.addClass('wpafi-rule-limit-locked');
-				var upgradeHtml =
-					wpafi_vars.show_pro_teasers
-						? '<span class="wpafi-rule-limit-upgrade">— <a href="' +
-								wpafi_vars.upgrade_url +
-								'" target="_blank">' +
-								wpafi_vars.upgrade_text +
-								'</a></span>'
-						: '';
+				const upgradeHtml = wpafi_vars.show_pro_teasers
+					? '<span class="wpafi-rule-limit-upgrade">— <a href="' +
+						wpafi_vars.upgrade_url +
+						'" target="_blank">' +
+						wpafi_vars.upgrade_text +
+						'</a></span>'
+					: '';
 				$limitElement.html(
 					'<span class="dashicons dashicons-lock"></span>' +
 						'<span>' +
@@ -702,39 +705,35 @@ jQuery(document).ready(function ($) {
 	// ============================================
 
 	// Toggle card collapse.
-	$(document).on(
-		'click',
-		'.wpafi-rule-card-header',
-		function (e) {
-			// Don't collapse if clicking inputs/buttons inside header.
-			if (
-				$(e.target).closest(
-					'.wpafi-rule-name, .wpafi-rule-header-actions, .wpafi-toggle'
-				).length
-			) {
-				return;
-			}
-
-			const $card = $(this).closest('.wpafi-rule-card');
-			const $stateInput = $card.find('.wpafi-rule-collapsed-state');
-			const isCollapsed = $card.hasClass('is-collapsed');
-			const isDisabled = $card.hasClass('is-disabled');
-
-			// If disabled, don't allow expanding, but allow collapsing.
-			if (isDisabled && isCollapsed) {
-				wpafi.toast('Please enable the rule first to edit it', 'warning');
-				return;
-			}
-
-			if (isCollapsed) {
-				$card.removeClass('is-collapsed');
-				$stateInput.val('0');
-			} else {
-				$card.addClass('is-collapsed');
-				$stateInput.val('1');
-			}
+	$(document).on('click', '.wpafi-rule-card-header', function (e) {
+		// Don't collapse if clicking inputs/buttons inside header.
+		if (
+			$(e.target).closest(
+				'.wpafi-rule-name, .wpafi-rule-header-actions, .wpafi-toggle'
+			).length
+		) {
+			return;
 		}
-	);
+
+		const $card = $(this).closest('.wpafi-rule-card');
+		const isCollapsed = $card.hasClass('is-collapsed');
+		const isDisabled = $card.hasClass('is-disabled');
+
+		// If disabled, don't allow expanding, but allow collapsing.
+		if (isDisabled && isCollapsed) {
+			wpafi.toast('Please enable the rule first to edit it', 'warning');
+			return;
+		}
+
+		const $stateInput = $card.find('.wpafi-rule-collapsed-state');
+		if (isCollapsed) {
+			$card.removeClass('is-collapsed');
+			$stateInput.val('0');
+		} else {
+			$card.addClass('is-collapsed');
+			$stateInput.val('1');
+		}
+	});
 
 	// Toggle card enabled/disabled.
 	$(document).on('change', '.wpafi-rule-enabled-toggle', function () {
@@ -885,34 +884,33 @@ jQuery(document).ready(function ($) {
 			return;
 		}
 
-		// Check if offer was previously dismissed (session-based).
-		const dismissedKey = 'wpafi_offer_dismissed';
-		// TESTING: Disabled session check - uncomment for production
-		// if (sessionStorage.getItem(dismissedKey)) {
-		// 	$banner.remove();
-		// 	return;
-		// }
-
-		// Handle dismiss button - TESTING: Disabled for testing
-		/*
+		// Handle dismiss button.
 		$banner.on('click', '.wpafi-offer-dismiss', function (e) {
 			e.preventDefault();
 			$banner.addClass('dismissed');
-			sessionStorage.setItem(dismissedKey, '1');
+			sessionStorage.setItem('wpafi_offer_dismissed', '1');
 
 			// Remove from DOM after animation.
 			setTimeout(function () {
 				$banner.remove();
 			}, 300);
 		});
-		*/
+
+		// Check if offer was previously dismissed (session-based).
+		if (sessionStorage.getItem('wpafi_offer_dismissed')) {
+			$banner.remove();
+			return;
+		}
 
 		// Initialize countdown timer if present.
 		const $countdown = $banner.find('.wpafi-offer-countdown');
 		if ($countdown.length) {
 			const endTime = $countdown.data('countdown');
 			if (endTime) {
-				initCountdownTimer($countdown.find('.wpafi-countdown-timer'), endTime);
+				initCountdownTimer(
+					$countdown.find('.wpafi-countdown-timer'),
+					endTime
+				);
 			}
 		}
 	}
@@ -942,8 +940,12 @@ jQuery(document).ready(function ($) {
 
 			// Calculate time units.
 			const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-			const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-			const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+			const hours = Math.floor(
+				(distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+			);
+			const minutes = Math.floor(
+				(distance % (1000 * 60 * 60)) / (1000 * 60)
+			);
 			const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
 			// Format display.

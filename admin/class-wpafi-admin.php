@@ -744,7 +744,7 @@ class WPAFI_Admin {
 			wp_send_json_error( array( 'message' => 'No settings configured' ) );
 		}
 
-		$rule_idx = isset( $_POST['rule_idx'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_idx'] ) ) : 'all';
+		$rule_idx = isset( $_POST['ruleIdx'] ) ? sanitize_text_field( wp_unslash( $_POST['ruleIdx'] ) ) : 'all';
 		$targets  = $this->get_bulk_targets( $rule_idx, $options );
 
 		$args = array(
@@ -786,7 +786,7 @@ class WPAFI_Admin {
 			wp_send_json_error( array( 'message' => 'No settings configured' ) );
 		}
 
-		$rule_idx = isset( $_POST['rule_idx'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_idx'] ) ) : 'all';
+		$rule_idx = isset( $_POST['ruleIdx'] ) ? sanitize_text_field( wp_unslash( $_POST['ruleIdx'] ) ) : 'all';
 		$offset   = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
 		$limit    = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 50;
 		$updated  = 0;
@@ -883,8 +883,8 @@ class WPAFI_Admin {
 			}
 		}
 
-		$processed  = $offset + count( $batch_ids );
-		$has_more   = $processed < $total;
+		$processed   = $offset + count( $batch_ids );
+		$has_more    = $processed < $total;
 		$next_offset = $has_more ? $processed : null;
 
 		// Clean up transient if done.

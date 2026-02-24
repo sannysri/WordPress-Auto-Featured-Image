@@ -72,7 +72,7 @@ $post_statuses    = array(
 				<span class="wpafi-offer-message"><?php echo esc_html( $offer['message'] ); ?></span>
 				<?php endif; ?>
 			</div>
-			<?php if ( $offer['type'] === 'limited' && ! empty( $offer['remaining'] ) ) : ?>
+			<?php if ( 'limited' === $offer['type'] && ! empty( $offer['remaining'] ) ) : ?>
 			<span class="wpafi-offer-remaining">
 				<span class="wpafi-offer-remaining-count"><?php echo absint( $offer['remaining'] ); ?></span>
 				<?php esc_html_e( 'left', 'sny-auto-featured-image' ); ?>
