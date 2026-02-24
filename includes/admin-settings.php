@@ -134,12 +134,21 @@ $post_statuses    = array(
 					<div id="wpafi-rules-container">
 						<?php
 						if ( ! empty( $rules ) ) {
+							// Find the first active rule index to expand it.
+							$first_active_index = null;
+							foreach ( $rules as $i => $r ) {
+								if ( ! isset( $r['enabled'] ) || $r['enabled'] ) {
+									$first_active_index = $i;
+									break;
+								}
+							}
+
 							foreach ( $rules as $index => $rule ) {
-								wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_types, $post_statuses );
+								wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_types, $post_statuses, $first_active_index );
 							}
 						} else {
 							// Show one empty card by default.
-							wpafi_render_image_rule_card( 0, array(), $categories, $tags, $post_types, $post_statuses );
+							wpafi_render_image_rule_card( 0, array(), $categories, $tags, $post_types, $post_statuses, 0 );
 						}
 						?>
 					</div>
@@ -757,21 +766,22 @@ $post_statuses    = array(
 
 <!-- Template for new rules (cloned by JS) -->
 <script type="text/template" id="wpafi-rule-template">
-	<?php wpafi_render_image_rule_card( '{{INDEX}}', array(), $categories, $tags, $post_types, $post_statuses ); ?>
+	<?php wpafi_render_image_rule_card( '{{INDEX}}', array(), $categories, $tags, $post_types, $post_statuses, null ); ?>
 </script>
 
 <?php
 /**
  * Render a complete image rule card with image selector and conditions.
  *
- * @param int|string $index         Rule index.
- * @param array      $rule          Rule data.
- * @param array      $categories    Available categories.
- * @param array      $tags          Available tags.
- * @param array      $post_types    Available post types.
- * @param array      $post_statuses Available post statuses.
+ * @param int|string $index              Rule index.
+ * @param array      $rule               Rule data.
+ * @param array      $categories         Available categories.
+ * @param array      $tags               Available tags.
+ * @param array      $post_types         Available post types.
+ * @param array      $post_statuses      Available post statuses.
+ * @param int|null   $first_active_index Index of the first active rule (to expand).
  */
-function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_types, $post_statuses ) {
+function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_types, $post_statuses, $first_active_index = null ) {
 	// Determine if Pro teasers should show (recalculate since we're in a separate function).
 	$has_pro          = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
 	$show_pro_teasers = ! $has_pro && function_exists( 'wpafi_should_show_pro_teasers' ) && wpafi_should_show_pro_teasers();
@@ -792,8 +802,18 @@ function wpafi_render_image_rule_card( $index, $rule, $categories, $tags, $post_
 	$rule_number       = is_numeric( $index ) ? intval( $index ) + 1 : '?';
 	$rule_name         = isset( $rule['name'] ) ? $rule['name'] : '';
 	$is_enabled        = isset( $rule['enabled'] ) ? (bool) $rule['enabled'] : true;
-	// Force collapse if disabled, otherwise check saved state.
-	$is_collapsed      = ! $is_enabled || ( isset( $rule['collapsed'] ) && (bool) $rule['collapsed'] );
+
+	// Collapse logic: expand only the first active rule, collapse all others.
+	// - Disabled rules are always collapsed.
+	// - If this is the first active rule (matches $first_active_index), expand it.
+	// - All other active rules are collapsed.
+	if ( ! $is_enabled ) {
+		$is_collapsed = true;
+	} elseif ( null !== $first_active_index && $index === $first_active_index ) {
+		$is_collapsed = false; // First active rule is expanded.
+	} else {
+		$is_collapsed = true; // Other active rules are collapsed.
+	}
 
 	$card_classes = array( 'wpafi-rule-card' );
 	if ( ! $is_enabled ) {

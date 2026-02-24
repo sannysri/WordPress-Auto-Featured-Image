@@ -165,8 +165,15 @@ jQuery(document).ready(function ($) {
 	})();
 
 	// ============================================
-	// Bulk Operations with Progress
+	// Bulk Operations with Batched Processing
 	// ============================================
+
+	const BATCH_SIZE = 50; // Process 50 posts per batch.
+	let bulkState = {
+		totalUpdated: 0,
+		totalFailed: 0,
+		cancelled: false,
+	};
 
 	$('#wpafi-bulk-assign').on('click', function (e) {
 		e.preventDefault();
@@ -178,6 +185,7 @@ jQuery(document).ready(function ($) {
 	// Modal cancel button.
 	$('#wpafi-modal-cancel, .wpafi-modal-overlay').on('click', function () {
 		$('#wpafi-warning-modal').fadeOut(200);
+		bulkState.cancelled = true;
 		wpafi.toast('Bulk operation cancelled', 'warning');
 	});
 
@@ -187,32 +195,110 @@ jQuery(document).ready(function ($) {
 		runBulkOperation();
 	});
 
-	// Actual bulk operation function.
+	// Actual bulk operation function with batching.
 	function runBulkOperation() {
 		const $button = $('#wpafi-bulk-assign');
 		const $spinner = $('#wpafi-bulk-spinner');
 		const $result = $('#wpafi-bulk-result');
 		const $progressContainer = $('#wpafi-progress-container');
+		const ruleIdx = $('#wpafi-bulk-rule').val();
+
+		// Reset state.
+		bulkState = { totalUpdated: 0, totalFailed: 0, cancelled: false };
 
 		$button.prop('disabled', true);
 		$spinner.addClass('is-active');
 		$result.html('');
 		$progressContainer.show();
-		wpafi.updateProgress(0, 'Starting...');
+		wpafi.updateProgress(0, 'Counting posts...');
 
-		// Simulated progress (actual batch processing can be added later).
-		const progressInterval = setInterval(function () {
-			const current =
-				(parseInt($('#wpafi-progress-fill').css('width')) /
-					$('#wpafi-progress-bar').width()) *
-				100;
-			if (current < 90) {
+		// First, get total count.
+		$.ajax({
+			url: wpafi_vars.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'wpafi_bulk_count',
+				nonce: wpafi_vars.bulk_nonce,
+				rule_idx: ruleIdx,
+			},
+			success(response) {
+				if (!response.success) {
+					finishBulkOperation(
+						$button,
+						$spinner,
+						$progressContainer,
+						$result,
+						false,
+						response.data.message
+					);
+					return;
+				}
+
+				const total = response.data.total;
+				if (total === 0) {
+					finishBulkOperation(
+						$button,
+						$spinner,
+						$progressContainer,
+						$result,
+						true,
+						'No posts found to process.'
+					);
+					return;
+				}
+
 				wpafi.updateProgress(
-					Math.min(current + 10, 90),
-					'Processing...'
+					0,
+					'Processing 0 of ' + total + ' posts...'
 				);
-			}
-		}, 500);
+
+				// Start processing batches.
+				processBatch(
+					ruleIdx,
+					0,
+					total,
+					$button,
+					$spinner,
+					$progressContainer,
+					$result
+				);
+			},
+			error() {
+				finishBulkOperation(
+					$button,
+					$spinner,
+					$progressContainer,
+					$result,
+					false,
+					'Failed to count posts. Please try again.'
+				);
+			},
+		});
+	}
+
+	// Process a single batch.
+	function processBatch(
+		ruleIdx,
+		offset,
+		total,
+		$button,
+		$spinner,
+		$progressContainer,
+		$result
+	) {
+		if (bulkState.cancelled) {
+			finishBulkOperation(
+				$button,
+				$spinner,
+				$progressContainer,
+				$result,
+				true,
+				'Operation cancelled. Updated ' +
+					bulkState.totalUpdated +
+					' posts.'
+			);
+			return;
+		}
 
 		$.ajax({
 			url: wpafi_vars.ajax_url,
@@ -220,48 +306,116 @@ jQuery(document).ready(function ($) {
 			data: {
 				action: 'wpafi_bulk_assign',
 				nonce: wpafi_vars.bulk_nonce,
-				rule_idx: $('#wpafi-bulk-rule').val(),
+				rule_idx: ruleIdx,
+				offset: offset,
+				limit: BATCH_SIZE,
 			},
 			success(response) {
-				clearInterval(progressInterval);
-				$spinner.removeClass('is-active');
-				$button.prop('disabled', false);
-
-				if (response.success) {
-					wpafi.updateProgress(100, 'Complete!');
-					$result.html(
-						'<div class="notice notice-success inline"><p>' +
-							response.data.message +
-							'</p></div>'
+				if (!response.success) {
+					finishBulkOperation(
+						$button,
+						$spinner,
+						$progressContainer,
+						$result,
+						false,
+						response.data.message
 					);
-					wpafi.toast(response.data.message, 'success');
+					return;
+				}
 
+				const data = response.data;
+				bulkState.totalUpdated += data.updated;
+				bulkState.totalFailed += data.failed;
+
+				const progress = Math.round((data.processed / total) * 100);
+				wpafi.updateProgress(
+					progress,
+					'Processing ' + data.processed + ' of ' + total + ' posts...'
+				);
+
+				if (data.has_more && !bulkState.cancelled) {
+					// Process next batch.
 					setTimeout(function () {
-						$progressContainer.hide();
-						wpafi.updateProgress(0, '');
-					}, 3000);
+						processBatch(
+							ruleIdx,
+							data.next_offset,
+							total,
+							$button,
+							$spinner,
+							$progressContainer,
+							$result
+						);
+					}, 100); // Small delay to prevent server overload.
 				} else {
-					wpafi.updateProgress(0, 'Error');
-					$result.html(
-						'<div class="notice notice-error inline"><p>' +
-							response.data.message +
-							'</p></div>'
+					// All done!
+					const message =
+						'Bulk operation complete. ' +
+						bulkState.totalUpdated +
+						' posts updated, ' +
+						bulkState.totalFailed +
+						' failed.';
+					finishBulkOperation(
+						$button,
+						$spinner,
+						$progressContainer,
+						$result,
+						true,
+						message
 					);
-					wpafi.toast(response.data.message, 'error');
-					$progressContainer.hide();
 				}
 			},
 			error() {
-				clearInterval(progressInterval);
-				$spinner.removeClass('is-active');
-				$button.prop('disabled', false);
-				$progressContainer.hide();
-				$result.html(
-					'<div class="notice notice-error inline"><p>An error occurred. Please try again.</p></div>'
+				finishBulkOperation(
+					$button,
+					$spinner,
+					$progressContainer,
+					$result,
+					false,
+					'Batch failed at offset ' +
+						offset +
+						'. Updated ' +
+						bulkState.totalUpdated +
+						' posts before error.'
 				);
-				wpafi.toast('An error occurred. Please try again.', 'error');
 			},
 		});
+	}
+
+	// Finish bulk operation and reset UI.
+	function finishBulkOperation(
+		$button,
+		$spinner,
+		$progressContainer,
+		$result,
+		success,
+		message
+	) {
+		$spinner.removeClass('is-active');
+		$button.prop('disabled', false);
+
+		if (success) {
+			wpafi.updateProgress(100, 'Complete!');
+			$result.html(
+				'<div class="notice notice-success inline"><p>' +
+					message +
+					'</p></div>'
+			);
+			wpafi.toast(message, 'success');
+
+			setTimeout(function () {
+				$progressContainer.hide();
+				wpafi.updateProgress(0, '');
+			}, 3000);
+		} else {
+			wpafi.updateProgress(0, 'Error');
+			$result.html(
+				'<div class="notice notice-error inline"><p>' +
+					message +
+					'</p></div>'
+			);
+			wpafi.toast(message, 'error');
+			$progressContainer.hide();
+		}
 	}
 
 	// ============================================

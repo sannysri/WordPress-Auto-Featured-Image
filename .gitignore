@@ -35,6 +35,13 @@ composer.lock
 /coverage/
 .phpunit.result.cache
 
+# Ignore E2E tests (run against live WordPress - dangerous)
+/tests/e2e-test.php
+/tests/test-bulk-batch.php
+
+# Ignore internal docs
+/docs/
+
 # Ignore local development files
 *.sql
 *.sql.gz

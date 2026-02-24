@@ -22,6 +22,7 @@ class WPAFI_Admin {
 
 		// AJAX handlers for bulk operations.
 		add_action( 'wp_ajax_wpafi_bulk_assign', array( $this, 'ajax_bulk_assign' ) );
+		add_action( 'wp_ajax_wpafi_bulk_count', array( $this, 'ajax_bulk_count' ) );
 
 		// Image column in posts list.
 		add_action( 'admin_init', array( $this, 'setup_image_column' ) );
@@ -694,6 +695,80 @@ class WPAFI_Admin {
 	}
 
 	/**
+	 * Get target post types and rules for bulk operations.
+	 *
+	 * @param string $rule_idx Rule index or 'all'.
+	 * @param array  $options Plugin options.
+	 * @return array Array with 'target_rules' and 'target_post_types'.
+	 */
+	private function get_bulk_targets( $rule_idx, $options ) {
+		$target_rules = array();
+		if ( 'all' === $rule_idx ) {
+			$target_rules = ! empty( $options['wpafi_rules'] ) ? $options['wpafi_rules'] : array();
+		} elseif ( is_numeric( $rule_idx ) && isset( $options['wpafi_rules'][ $rule_idx ] ) ) {
+			$target_rules = array( $options['wpafi_rules'][ $rule_idx ] );
+		}
+
+		$target_post_types = array();
+		if ( ! empty( $target_rules ) ) {
+			foreach ( $target_rules as $rule ) {
+				$rule_pts = ! empty( $rule['post_types'] ) ? (array) $rule['post_types'] : array();
+				if ( empty( $rule_pts ) ) {
+					$target_post_types = get_post_types( array( 'public' => true ), 'names' );
+					break;
+				}
+				$target_post_types = array_merge( $target_post_types, $rule_pts );
+			}
+		} else {
+			$target_post_types = ! empty( $options['wpafi_post_type'] ) ? $options['wpafi_post_type'] : array( 'post' );
+		}
+
+		return array(
+			'target_rules'      => $target_rules,
+			'target_post_types' => array_unique( $target_post_types ),
+		);
+	}
+
+	/**
+	 * AJAX handler for counting posts to process in bulk operations.
+	 */
+	public function ajax_bulk_count() {
+		check_ajax_referer( 'wpafi_bulk_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+		}
+
+		$options = get_option( 'wpafi_options' );
+		if ( empty( $options ) || ! is_array( $options ) ) {
+			wp_send_json_error( array( 'message' => 'No settings configured' ) );
+		}
+
+		$rule_idx = isset( $_POST['rule_idx'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_idx'] ) ) : 'all';
+		$targets  = $this->get_bulk_targets( $rule_idx, $options );
+
+		$args = array(
+			'post_type'      => $targets['target_post_types'],
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		);
+
+		$post_ids = get_posts( $args );
+
+		// Store post IDs in transient for consistent batching.
+		$batch_key = 'wpafi_bulk_' . get_current_user_id();
+		set_transient( $batch_key, $post_ids, HOUR_IN_SECONDS );
+
+		wp_send_json_success(
+			array(
+				'total'     => count( $post_ids ),
+				'batch_key' => $batch_key,
+			)
+		);
+	}
+
+	/**
 	 * AJAX handler for bulk assigning featured images.
 	 */
 	public function ajax_bulk_assign() {
@@ -712,45 +787,33 @@ class WPAFI_Admin {
 		}
 
 		$rule_idx = isset( $_POST['rule_idx'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_idx'] ) ) : 'all';
+		$offset   = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
+		$limit    = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 50;
 		$updated  = 0;
 		$failed   = 0;
 
-		// Determine target rules.
-		$target_rules = array();
-		if ( 'all' === $rule_idx ) {
-			$target_rules = ! empty( $options['wpafi_rules'] ) ? $options['wpafi_rules'] : array();
-		} elseif ( is_numeric( $rule_idx ) && isset( $options['wpafi_rules'][ $rule_idx ] ) ) {
-			$target_rules = array( $options['wpafi_rules'][ $rule_idx ] );
+		// Get post IDs from transient or query fresh.
+		$batch_key = 'wpafi_bulk_' . get_current_user_id();
+		$post_ids  = get_transient( $batch_key );
+
+		if ( false === $post_ids ) {
+			// Transient expired - query fresh.
+			$targets  = $this->get_bulk_targets( $rule_idx, $options );
+			$args     = array(
+				'post_type'      => $targets['target_post_types'],
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			);
+			$post_ids = get_posts( $args );
 		}
 
-		// Get all public post types if using multiple rules, or specific ones if using one rule.
-		$target_post_types = array();
-		if ( ! empty( $target_rules ) ) {
-			foreach ( $target_rules as $rule ) {
-				$rule_pts = ! empty( $rule['post_types'] ) ? (array) $rule['post_types'] : array();
-				if ( empty( $rule_pts ) ) {
-					// Rule with no post type targets all public types.
-					$target_post_types = get_post_types( array( 'public' => true ), 'names' );
-					break;
-				}
-				$target_post_types = array_merge( $target_post_types, $rule_pts );
-			}
-		} else {
-			// Legacy fallback.
-			$target_post_types = ! empty( $options['wpafi_post_type'] ) ? $options['wpafi_post_type'] : array( 'post' );
-		}
-		$target_post_types = array_unique( $target_post_types );
+		$total        = count( $post_ids );
+		$batch_ids    = array_slice( $post_ids, $offset, $limit );
+		$targets      = $this->get_bulk_targets( $rule_idx, $options );
+		$target_rules = $targets['target_rules'];
 
-		$args = array(
-			'post_type'      => $target_post_types,
-			'post_status'    => 'publish',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-		);
-
-		$post_ids = get_posts( $args );
-
-		foreach ( $post_ids as $post_id ) {
+		foreach ( $batch_ids as $post_id ) {
 			$image_id = null;
 			$matched  = false;
 
@@ -820,16 +883,30 @@ class WPAFI_Admin {
 			}
 		}
 
+		$processed  = $offset + count( $batch_ids );
+		$has_more   = $processed < $total;
+		$next_offset = $has_more ? $processed : null;
+
+		// Clean up transient if done.
+		if ( ! $has_more ) {
+			delete_transient( $batch_key );
+		}
+
 		wp_send_json_success(
 			array(
-				'message' => sprintf(
+				'message'     => sprintf(
 					/* translators: %1$d: number of posts updated, %2$d: number failed */
-					__( 'Bulk operation complete. %1$d posts updated, %2$d failed.', 'sny-auto-featured-image' ),
+					__( 'Processed %1$d posts: %2$d updated, %3$d failed.', 'sny-auto-featured-image' ),
+					count( $batch_ids ),
 					$updated,
 					$failed
 				),
-				'updated' => $updated,
-				'failed'  => $failed,
+				'updated'     => $updated,
+				'failed'      => $failed,
+				'processed'   => $processed,
+				'total'       => $total,
+				'has_more'    => $has_more,
+				'next_offset' => $next_offset,
 			)
 		);
 	}
