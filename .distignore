@@ -26,6 +26,7 @@ phpunit.xml.dist
 /.github/
 
 # Documentation
+/docs/
 CONTRIBUTING.md
 readme.md
 CODE_OF_CONDUCT.md

@@ -30,7 +30,8 @@
 			"no-console": "warn",
 			"no-alert": "off",
 			"camelcase": ["error", {"allow": ["wpafi_vars"]}]
-		}
+		},
+		"ignorePatterns": ["js/vendor/**", "css/vendor/**"]
 	},
 	"stylelint": {
 		"extends": "@wordpress/stylelint-config",

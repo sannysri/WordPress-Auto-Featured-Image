@@ -35,7 +35,7 @@ composer.lock
 /coverage/
 .phpunit.result.cache
 
-# Ignore E2E tests (run against live WordPress - dangerous)
+# Ignore ad-hoc live-site runners (keep staging-e2e.php tracked)
 /tests/e2e-test.php
 /tests/test-bulk-batch.php
 

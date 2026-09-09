@@ -51,7 +51,7 @@ class WPAFI_Settings {
 	 */
 	public function wpafi_description() {
 		echo '<div class="wpafi-description">';
-		echo '<p>' . esc_html__( 'WP Auto Featured Image allows you to streamline the process of setting featured images effortlessly for your posts, pages, or custom post types. Establish a default fallback image based on categories and ensure a consistent and efficient way to manage featured images across your content.', 'sny-auto-featured-image' ) . '</p>';
+		echo '<p>' . esc_html__( 'SNY Auto Featured Image allows you to streamline the process of setting featured images effortlessly for your posts, pages, or custom post types. Establish default fallback images or conditional rules to ensure a consistent and efficient way to manage featured images across your content.', 'sny-auto-featured-image' ) . '</p>';
 		echo '<p>' . esc_html__( 'Please note that the conditions specified below work in conjunction with an AND logical operator. This means that all conditions must be true for the featured image to be set.', 'sny-auto-featured-image' ) . '</p>';
 		echo '<p>' . esc_html__( 'The thumbnail will be set when a post is published. For "page" post types, conditions such as category and tags will be ignored, and the default thumbnail will be applied to all pages upon publishing.', 'sny-auto-featured-image' ) . '</p>';
 		echo '</div>';
@@ -278,7 +278,7 @@ class WPAFI_Settings {
 		$has_pro = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
 		if ( ! $has_pro ) {
 			echo '<p class="description"><strong>' . esc_html__( 'Free version: 2 rules maximum.', 'sny-auto-featured-image' ) . '</strong> ';
-			echo '<a href="https://sanny.dev/plugins/auto-featured-image-pro/?utm_source=plugin&utm_medium=rules&utm_campaign=upsell">' . esc_html__( 'Upgrade to Pro for unlimited rules', 'sny-auto-featured-image' ) . '</a></p>';
+			echo '<a href="https://sanny.dev/plugins/sny-auto-featured-image-pro/?utm_source=plugin&utm_medium=rules&utm_campaign=roadmap" target="_blank">' . esc_html__( 'More rules coming in Pro', 'sny-auto-featured-image' ) . '</a></p>';
 		}
 	}
 

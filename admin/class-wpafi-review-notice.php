@@ -58,7 +58,6 @@ class WPAFI_Review_Notice {
 		$this->maybe_set_install_time();
 		add_action( 'admin_notices', array( $this, 'maybe_display_notice' ) );
 		add_action( 'admin_init', array( $this, 'handle_notice_actions' ) );
-		add_action( 'admin_head', array( $this, 'notice_styles' ) );
 	}
 
 	/**
@@ -119,6 +118,7 @@ class WPAFI_Review_Notice {
 	 * @return void
 	 */
 	private function display_notice() {
+		$this->notice_styles();
 		$review_url  = 'https://wordpress.org/support/plugin/wp-auto-featured-image/reviews/?filter=5#new-post';
 		$dismiss_url = wp_nonce_url( add_query_arg( 'wpafi_review_action', 'dismiss' ), 'wpafi_review_nonce' );
 		$later_url   = wp_nonce_url( add_query_arg( 'wpafi_review_action', 'later' ), 'wpafi_review_nonce' );

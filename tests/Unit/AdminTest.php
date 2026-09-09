@@ -344,4 +344,219 @@ class AdminTest extends TestCase {
 
 		$this->assertFalse( $result );
 	}
+
+	/**
+	 * Test wpafi_set_thumbnail calls get_first_image_from_content with correct argument order:
+	 * ( post_id, include_video, sideload ).
+	 */
+	public function test_wpafi_set_thumbnail_calls_get_first_image_with_correct_argument_order(): void {
+		$post_id = 456;
+		$rule = [
+			'name'              => 'First Image Rule',
+			'enabled'           => 1,
+			'overwrite'         => 0,
+			'image_source'      => 'first_image',
+			'include_video'     => 1, // include_video is TRUE
+			'sideload_external' => 0, // sideload is FALSE
+			'post_types'        => [ 'post' ],
+			'categories'        => [],
+			'tags'              => [],
+			'post_statuses'     => [],
+		];
+
+		$options = [
+			'wpafi_rules' => [ $rule ],
+		];
+
+		$mock_post              = new \stdClass();
+		$mock_post->ID          = $post_id;
+		$mock_post->post_type   = 'post';
+		$mock_post->post_status = 'publish';
+		$mock_post->post_content = '<p>Hello world</p>';
+
+		$GLOBALS['wp_test_options']['wpafi_options'] = $options;
+
+		Functions\when( 'wpafi_has_pro_features' )->justReturn( false );
+		Functions\when( 'wp_is_post_revision' )->justReturn( false );
+		Functions\when( 'wp_is_post_autosave' )->justReturn( false );
+		Functions\when( 'get_post' )->justReturn( $mock_post );
+		Functions\when( 'has_post_thumbnail' )->justReturn( false );
+
+		$captured_args = [];
+		// Subclass or mock admin method to spy on arguments.
+		$admin_spy = $this->getMockBuilder( '\WPAFI_Admin' )
+			->disableOriginalConstructor()
+			->onlyMethods( [ 'get_first_image_from_content' ] )
+			->getMock();
+
+		$admin_spy->expects( $this->once() )
+			->method( 'get_first_image_from_content' )
+			->with(
+				$this->equalTo( $post_id ),
+				$this->equalTo( true ),  // 2nd arg: include_video
+				$this->equalTo( false )  // 3rd arg: sideload
+			)
+			->willReturn( 789 );
+
+		Functions\expect( 'set_post_thumbnail' )
+			->once()
+			->with( $post_id, 789 )
+			->andReturn( true );
+
+		$admin_spy->wpafi_set_thumbnail( $post_id );
+	}
+
+	/**
+	 * Test that legacy v2.0.3 options (without wpafi_rules) still assign default thumbnail.
+	 */
+	public function test_legacy_v203_options_fallback_assigns_default_thumbnail(): void {
+		$post_id = 999;
+		$legacy_options = [
+			'wpafi_default_thumb_id' => 777,
+			'wpafi_post_type'        => [ 'post' ],
+			'wpafi_categories'       => [],
+			'wpafi_tags'             => [],
+			'wpafi_overwrite'        => 0,
+		];
+
+		$GLOBALS['wp_test_options']['wpafi_options'] = $legacy_options;
+
+		$mock_post              = new \stdClass();
+		$mock_post->ID          = $post_id;
+		$mock_post->post_type   = 'post';
+		$mock_post->post_status = 'publish';
+
+		Functions\when( 'wpafi_has_pro_features' )->justReturn( false );
+		Functions\when( 'wp_is_post_revision' )->justReturn( false );
+		Functions\when( 'wp_is_post_autosave' )->justReturn( false );
+		Functions\when( 'get_post' )->justReturn( $mock_post );
+		Functions\when( 'get_post_type' )->justReturn( 'post' );
+		Functions\when( 'has_post_thumbnail' )->justReturn( false );
+
+		Functions\expect( 'set_post_thumbnail' )
+			->once()
+			->with( $post_id, 777 )
+			->andReturn( true );
+
+		$this->admin->wpafi_set_thumbnail( $post_id );
+	}
+
+	/**
+	 * Test that get_bulk_targets includes taxonomy query when a rule specifies categories.
+	 */
+	public function test_get_bulk_targets_includes_tax_query_for_category_rule(): void {
+		$options = [
+			'wpafi_rules' => [
+				[
+					'name'          => 'News Rule',
+					'enabled'       => 1,
+					'post_types'    => [ 'post' ],
+					'categories'    => [ 'news' ],
+					'tags'          => [],
+					'post_statuses' => [ 'publish' ],
+					'image_source'  => 'media',
+					'image_id'      => 123,
+				],
+			],
+		];
+
+		$reflection = new ReflectionClass( $this->admin );
+		$method     = $reflection->getMethod( 'get_bulk_targets' );
+
+		$result = $method->invoke( $this->admin, 0, $options );
+
+		$this->assertArrayHasKey( 'query_args', $result );
+		$this->assertArrayHasKey( 'tax_query', $result['query_args'] );
+		$this->assertEquals( 'post', $result['query_args']['post_type'][0] );
+		$this->assertEquals( 'category', $result['query_args']['tax_query'][0]['taxonomy'] );
+		$this->assertEquals( 'slug', $result['query_args']['tax_query'][0]['field'] );
+		$this->assertEquals( [ 'news' ], $result['query_args']['tax_query'][0]['terms'] );
+	}
+
+	/**
+	 * Smoke test ajax_bulk_preview and ajax_bulk_assign on a category rule.
+	 */
+	public function test_ajax_bulk_preview_and_apply_on_category_rule(): void {
+		$options = [
+			'wpafi_rules' => [
+				[
+					'name'          => 'News Category Rule',
+					'enabled'       => 1,
+					'post_types'    => [ 'post' ],
+					'categories'    => [ 'news' ],
+					'tags'          => [],
+					'post_statuses' => [ 'publish' ],
+					'image_source'  => 'media',
+					'image_id'      => 456,
+					'overwrite'     => 0,
+				],
+			],
+		];
+
+		$GLOBALS['wp_test_options']['wpafi_options'] = $options;
+		$_POST['ruleIdx']                            = '0';
+		$_POST['nonce']                              = 'valid_nonce';
+
+		$post_id                = 101;
+		$mock_post              = new \stdClass();
+		$mock_post->ID          = $post_id;
+		$mock_post->post_title  = 'Breaking News Post';
+		$mock_post->post_type   = 'post';
+		$mock_post->post_status = 'publish';
+
+		$GLOBALS['wp_test_query_posts']       = [ $post_id ];
+		$GLOBALS['wp_test_query_found_posts'] = 1;
+
+		$cat_obj       = new \stdClass();
+		$cat_obj->slug = 'news';
+
+		Functions\when( 'check_ajax_referer' )->justReturn( true );
+		Functions\when( 'current_user_can' )->justReturn( true );
+		Functions\when( 'sanitize_text_field' )->returnArg();
+		Functions\when( 'wp_unslash' )->returnArg();
+		Functions\when( 'absint' )->alias( function( $val ) {
+			return abs( intval( $val ) );
+		} );
+		Functions\when( 'get_post' )->justReturn( $mock_post );
+		Functions\when( 'get_post_type' )->justReturn( 'post' );
+		Functions\when( 'get_post_thumbnail_id' )->justReturn( 0 );
+		Functions\when( 'has_post_thumbnail' )->justReturn( false );
+		Functions\when( 'wp_get_attachment_image_url' )->justReturn( 'https://example.com/test.jpg' );
+		Functions\when( 'has_category' )->justReturn( true );
+		Functions\when( 'has_tag' )->justReturn( false );
+		Functions\when( 'get_the_category' )->justReturn( [ $cat_obj ] );
+		Functions\when( 'get_the_tags' )->justReturn( [] );
+
+		$preview_response = null;
+		Functions\when( 'wp_send_json_success' )->alias( function( $data ) use ( &$preview_response ) {
+			$preview_response = $data;
+		} );
+
+		// 1. Smoke ajax_bulk_preview.
+		$this->admin->ajax_bulk_preview();
+
+		$this->assertNotNull( $preview_response );
+		$this->assertCount( 1, $preview_response['rows'] );
+		$this->assertEquals( 101, $preview_response['rows'][0]['id'] );
+		$this->assertEquals( 'Breaking News Post', $preview_response['rows'][0]['title'] );
+		$this->assertEquals( 'set', $preview_response['rows'][0]['action'] );
+		$this->assertEquals( 'https://example.com/test.jpg', $preview_response['rows'][0]['proposed_thumb_url'] );
+
+		// 2. Smoke ajax_bulk_assign.
+		Functions\expect( 'set_post_thumbnail' )
+			->once()
+			->with( $post_id, 456 )
+			->andReturn( true );
+
+		$assign_response = null;
+		Functions\when( 'wp_send_json_success' )->alias( function( $data ) use ( &$assign_response ) {
+			$assign_response = $data;
+		} );
+
+		$this->admin->ajax_bulk_assign();
+
+		$this->assertNotNull( $assign_response );
+		$this->assertEquals( 1, $assign_response['updated'] );
+		$this->assertEquals( 0, $assign_response['failed'] );
+	}
 }

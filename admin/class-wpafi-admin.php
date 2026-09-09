@@ -23,6 +23,7 @@ class WPAFI_Admin {
 		// AJAX handlers for bulk operations.
 		add_action( 'wp_ajax_wpafi_bulk_assign', array( $this, 'ajax_bulk_assign' ) );
 		add_action( 'wp_ajax_wpafi_bulk_count', array( $this, 'ajax_bulk_count' ) );
+		add_action( 'wp_ajax_wpafi_bulk_preview', array( $this, 'ajax_bulk_preview' ) );
 
 		// Image column in posts list.
 		add_action( 'admin_init', array( $this, 'setup_image_column' ) );
@@ -102,8 +103,8 @@ class WPAFI_Admin {
 	 */
 	public function add_admin_page() {
 		add_options_page(
-			'Auto Featured Image Settings',
-			'Auto Featured Image',
+			'SNY Auto Featured Image Settings',
+			'SNY AFI',
 			'manage_options',
 			'wp_auto_featured_image',
 			array( $this, 'render_admin_page' )
@@ -122,29 +123,43 @@ class WPAFI_Admin {
 	 * Enqueue scripts and styles for the WP Auto Featured Image plugin.
 	 */
 	public function enqueue_scripts() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) {
+			return;
+		}
+
+		// Inject thumbnail column styling on post list screen only.
+		if ( 'edit' === $screen->base ) {
+			wp_add_inline_style( 'common', '.column-wpafi_image { width: 70px !important; text-align: center; }' );
+			return;
+		}
+
+		// Restrict all main styles and scripts strictly to the plugin settings screen.
+		if ( 'settings_page_wp_auto_featured_image' !== $screen->id ) {
+			return;
+		}
+
 		$has_pro_features = function_exists( 'wpafi_has_pro_features' ) && wpafi_has_pro_features();
 
-		// Register Select2 JS and CSS early so they can be used as dependencies.
-		wp_register_script( 'select2-js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
-		wp_register_style( 'select2-css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
+		// Register local Select2 JS and CSS (bundled locally, no third-party CDNs).
+		wp_register_script( 'select2-js', WPAFI_PLUGIN_URL . '/js/vendor/select2.min.js', array( 'jquery' ), '4.0.13', true );
+		wp_register_style( 'select2-css', WPAFI_PLUGIN_URL . '/css/vendor/select2.min.css', array(), '4.0.13' );
 
-		// Enqueue the main plugin stylesheet.
+		// Enqueue the main plugin stylesheet on settings screen only.
 		wp_enqueue_style( 'wpafi-style', WPAFI_PLUGIN_URL . '/css/wpafi-style.css', array(), WPAFI_VERSION );
 
 		// Register the main script with dependencies.
 		wp_register_script( 'wpafi-script', WPAFI_PLUGIN_URL . '/js/wpafi-script.js', array( 'jquery', 'media-upload', 'thickbox', 'select2-js' ), WPAFI_VERSION, true );
 
-		// Check if the current screen is the WP Auto Featured Image settings page.
-		if ( 'settings_page_wp_auto_featured_image' === get_current_screen()->id ) {
-			// Enqueue necessary scripts and styles for media upload.
-			wp_enqueue_script( 'jquery' );
-			wp_enqueue_style( 'select2-css' );
-			wp_enqueue_script( 'select2-js' );
-			wp_enqueue_script( 'media-upload' );
-			wp_enqueue_media();
+		// Enqueue necessary scripts and styles for media upload.
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_style( 'select2-css' );
+		wp_enqueue_script( 'select2-js' );
+		wp_enqueue_script( 'media-upload' );
+		wp_enqueue_media();
 
-			// Enqueue the main script for the settings page.
-			wp_enqueue_script( 'wpafi-script' );
+		// Enqueue the main script for the settings page.
+		wp_enqueue_script( 'wpafi-script' );
 
 			// Prepare categories for JS.
 			$categories     = get_categories( array( 'hide_empty' => false ) );
@@ -163,8 +178,8 @@ class WPAFI_Admin {
 			}
 
 			// Check if Pro teasers should be shown.
-			$show_pro_teasers = ! $has_pro_features && function_exists( 'wpafi_should_show_pro_teasers' ) && wpafi_should_show_pro_teasers();
-			$upgrade_url      = function_exists( 'wpafi_get_upgrade_url' ) ? wpafi_get_upgrade_url( 'add-btn' ) : 'https://sanny.dev/plugins/auto-featured-image-pro/';
+			$show_pro_teasers = ! $has_pro_features;
+			$upgrade_url      = 'https://sanny.dev/plugins/sny-auto-featured-image-pro/';
 
 			// Localize the script to pass data to JavaScript.
 			wp_localize_script(
@@ -178,16 +193,15 @@ class WPAFI_Admin {
 					'bulk_processing'    => esc_html__( 'Processing...', 'sny-auto-featured-image' ),
 					'bulk_confirm'       => esc_html__( 'This will update featured images for all matching posts. Continue?', 'sny-auto-featured-image' ),
 					'max_rules'          => $has_pro_features ? 999 : 2,
-					'max_rules_message'  => esc_html__( 'Upgrade to Pro for unlimited conditional rules!', 'sny-auto-featured-image' ),
+					'max_rules_message'  => esc_html__( 'More conditional rules coming in Pro!', 'sny-auto-featured-image' ),
 					'select_image_title' => esc_html__( 'Select Featured Image', 'sny-auto-featured-image' ),
 					'categories'         => $categories_arr,
 					'post_types'         => $post_types_arr,
 					'show_pro_teasers'   => $show_pro_teasers,
 					'upgrade_url'        => esc_url( $upgrade_url ),
-					'upgrade_text'       => esc_html__( 'Upgrade to add more', 'sny-auto-featured-image' ),
+					'upgrade_text'       => esc_html__( 'More rules in Pro (Coming Soon)', 'sny-auto-featured-image' ),
 				)
 			);
-		}
 	}
 
 	/**
@@ -242,7 +256,7 @@ class WPAFI_Admin {
 						// Get first image/video from post content.
 						$include_video = ! empty( $rule['include_video'] );
 						$sideload      = ! empty( $rule['sideload_external'] );
-						$image_id      = $this->get_first_image_from_content( $post_id, $sideload, $include_video );
+						$image_id      = $this->get_first_image_from_content( $post_id, $include_video, $sideload );
 						break;
 
 					case 'external':
@@ -550,6 +564,70 @@ class WPAFI_Admin {
 	}
 
 	/**
+	 * Extract first image URL from post content without downloading or writing to database.
+	 *
+	 * @param int  $post_id       Post ID.
+	 * @param bool $include_video Whether to check for video thumbnails.
+	 * @return string|false Image URL or false if not found.
+	 */
+	public function get_first_image_url_from_content( $post_id, $include_video = true ) {
+		$post = get_post( $post_id );
+		if ( ! $post || empty( $post->post_content ) ) {
+			return false;
+		}
+
+		$content = $post->post_content;
+
+		// Check video thumbnails.
+		if ( $include_video ) {
+			$youtube_patterns = array(
+				'/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/i',
+				'/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i',
+				'/youtu\.be\/([a-zA-Z0-9_-]+)/i',
+				'/youtube\.com\/v\/([a-zA-Z0-9_-]+)/i',
+			);
+			foreach ( $youtube_patterns as $pattern ) {
+				if ( preg_match( $pattern, $content, $matches ) ) {
+					return "https://img.youtube.com/vi/{$matches[1]}/hqdefault.jpg";
+				}
+			}
+
+			$vimeo_patterns = array(
+				'/vimeo\.com\/(\d+)/i',
+				'/player\.vimeo\.com\/video\/(\d+)/i',
+			);
+			foreach ( $vimeo_patterns as $pattern ) {
+				if ( preg_match( $pattern, $content, $matches ) ) {
+					$vimeo_thumb = $this->get_vimeo_thumbnail( $matches[1] );
+					if ( $vimeo_thumb ) {
+						return $vimeo_thumb;
+					}
+				}
+			}
+		}
+
+		// Match <img> tags in content.
+		if ( preg_match( '/<img[^>]+>/i', $content, $img_match ) ) {
+			$img_tag = $img_match[0];
+
+			// Try wp-image-{id} class pattern (Gutenberg).
+			if ( preg_match( '/wp-image-(\d+)/i', $img_tag, $class_match ) ) {
+				$attachment_url = wp_get_attachment_image_url( intval( $class_match[1] ), 'thumbnail' );
+				if ( $attachment_url ) {
+					return $attachment_url;
+				}
+			}
+
+			// Try src attribute.
+			if ( preg_match( '/src=["\']([^"\']+)["\']/i', $img_tag, $src_match ) ) {
+				return $src_match[1];
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Check if a URL is external (not from this site).
 	 *
 	 * @param string $url The URL to check.
@@ -695,11 +773,11 @@ class WPAFI_Admin {
 	}
 
 	/**
-	 * Get target post types and rules for bulk operations.
+	 * Get target query args and rules for bulk operations.
 	 *
 	 * @param string $rule_idx Rule index or 'all'.
 	 * @param array  $options Plugin options.
-	 * @return array Array with 'target_rules' and 'target_post_types'.
+	 * @return array Array with 'target_rules', 'target_post_types', and 'query_args'.
 	 */
 	private function get_bulk_targets( $rule_idx, $options ) {
 		$target_rules = array();
@@ -710,22 +788,109 @@ class WPAFI_Admin {
 		}
 
 		$target_post_types = array();
+		$target_statuses   = array();
+		$has_global_rule   = false;
+		$rule_tax_queries  = array();
+
 		if ( ! empty( $target_rules ) ) {
 			foreach ( $target_rules as $rule ) {
-				$rule_pts = ! empty( $rule['post_types'] ) ? (array) $rule['post_types'] : array();
-				if ( empty( $rule_pts ) ) {
-					$target_post_types = get_post_types( array( 'public' => true ), 'names' );
-					break;
+				if ( isset( $rule['enabled'] ) && ! $rule['enabled'] ) {
+					continue;
 				}
-				$target_post_types = array_merge( $target_post_types, $rule_pts );
+
+				$rule_pts  = ! empty( $rule['post_types'] ) ? array_values( array_filter( (array) $rule['post_types'] ) ) : array();
+				$rule_cats = ! empty( $rule['categories'] ) ? array_values( array_filter( (array) $rule['categories'] ) ) : array();
+				$rule_tags = ! empty( $rule['tags'] ) ? array_values( array_filter( (array) $rule['tags'] ) ) : array();
+				$rule_st   = ! empty( $rule['post_statuses'] ) ? array_values( array_filter( (array) $rule['post_statuses'] ) ) : array();
+
+				if ( ! empty( $rule_pts ) ) {
+					$target_post_types = array_merge( $target_post_types, $rule_pts );
+				}
+				if ( ! empty( $rule_st ) ) {
+					$target_statuses = array_merge( $target_statuses, $rule_st );
+				}
+
+				if ( empty( $rule_cats ) && empty( $rule_tags ) ) {
+					$has_global_rule = true;
+				} else {
+					$sub_tax = array();
+					if ( ! empty( $rule_cats ) ) {
+						$sub_tax[] = array(
+							'taxonomy' => 'category',
+							'field'    => 'slug',
+							'terms'    => $rule_cats,
+						);
+					}
+					if ( ! empty( $rule_tags ) ) {
+						$sub_tax[] = array(
+							'taxonomy' => 'post_tag',
+							'field'    => 'slug',
+							'terms'    => $rule_tags,
+						);
+					}
+					if ( count( $sub_tax ) > 1 ) {
+						$sub_tax['relation'] = 'AND';
+					}
+					$rule_tax_queries[] = $sub_tax;
+				}
 			}
 		} else {
-			$target_post_types = ! empty( $options['wpafi_post_type'] ) ? $options['wpafi_post_type'] : array( 'post' );
+			// Legacy options fallback.
+			$target_post_types = ! empty( $options['wpafi_post_type'] ) ? array_values( (array) $options['wpafi_post_type'] ) : array( 'post' );
+			$legacy_cats       = ! empty( $options['wpafi_categories'] ) ? array_values( (array) $options['wpafi_categories'] ) : array();
+			$legacy_tags       = ! empty( $options['wpafi_tags'] ) ? array_values( (array) $options['wpafi_tags'] ) : array();
+
+			if ( empty( $legacy_cats ) && empty( $legacy_tags ) ) {
+				$has_global_rule = true;
+			} else {
+				$sub_tax = array();
+				if ( ! empty( $legacy_cats ) ) {
+					$sub_tax[] = array(
+						'taxonomy' => 'category',
+						'field'    => 'slug',
+						'terms'    => $legacy_cats,
+					);
+				}
+				if ( ! empty( $legacy_tags ) ) {
+					$sub_tax[] = array(
+						'taxonomy' => 'post_tag',
+						'field'    => 'slug',
+						'terms'    => $legacy_tags,
+					);
+				}
+				if ( count( $sub_tax ) > 1 ) {
+					$sub_tax['relation'] = 'AND';
+				}
+				$rule_tax_queries[] = $sub_tax;
+			}
+		}
+
+		if ( empty( $target_post_types ) ) {
+			$target_post_types = get_post_types( array( 'public' => true ), 'names' );
+		} else {
+			$target_post_types = array_values( array_unique( $target_post_types ) );
+		}
+
+		$post_status = ! empty( $target_statuses ) ? array_values( array_unique( $target_statuses ) ) : 'publish';
+
+		$query_args = array(
+			'post_type'   => $target_post_types,
+			'post_status' => $post_status,
+			'fields'      => 'ids',
+		);
+
+		if ( ! $has_global_rule && ! empty( $rule_tax_queries ) ) {
+			if ( 1 === count( $rule_tax_queries ) ) {
+				$query_args['tax_query'] = $rule_tax_queries[0];
+			} else {
+				$query_args['tax_query'] = array_merge( array( 'relation' => 'OR' ), $rule_tax_queries );
+			}
 		}
 
 		return array(
 			'target_rules'      => $target_rules,
-			'target_post_types' => array_unique( $target_post_types ),
+			'target_post_types' => $target_post_types,
+			'query_args'        => $query_args,
 		);
 	}
 
@@ -735,7 +900,7 @@ class WPAFI_Admin {
 	public function ajax_bulk_count() {
 		check_ajax_referer( 'wpafi_bulk_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'edit_others_posts' ) ) {
 			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
 		}
 
@@ -744,39 +909,219 @@ class WPAFI_Admin {
 			wp_send_json_error( array( 'message' => 'No settings configured' ) );
 		}
 
-		$rule_idx = isset( $_POST['ruleIdx'] ) ? sanitize_text_field( wp_unslash( $_POST['ruleIdx'] ) ) : 'all';
-		$targets  = $this->get_bulk_targets( $rule_idx, $options );
+		$rule_idx   = isset( $_POST['ruleIdx'] ) ? sanitize_text_field( wp_unslash( $_POST['ruleIdx'] ) ) : 'all';
+		$targets    = $this->get_bulk_targets( $rule_idx, $options );
+		$query_args = $targets['query_args'];
 
-		$args = array(
-			'post_type'      => $targets['target_post_types'],
-			'post_status'    => 'publish',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-		);
+		$query_args['posts_per_page'] = 50;
+		$query_args['no_found_rows']  = false;
 
-		$post_ids = get_posts( $args );
-
-		// Store post IDs in transient for consistent batching.
-		$batch_key = 'wpafi_bulk_' . get_current_user_id();
-		set_transient( $batch_key, $post_ids, HOUR_IN_SECONDS );
+		$query          = new WP_Query( $query_args );
+		$total_matching = (int) $query->found_posts;
+		$capped_total   = min( 50, $total_matching );
 
 		wp_send_json_success(
 			array(
-				'total'     => count( $post_ids ),
-				'batch_key' => $batch_key,
+				'total'          => $capped_total,
+				'total_matching' => $total_matching,
+				'capped'         => $total_matching > 50,
 			)
 		);
 	}
 
 	/**
-	 * AJAX handler for bulk assigning featured images.
+	 * AJAX handler for previewing bulk featured image operations without writing changes.
 	 */
-	public function ajax_bulk_assign() {
-		// Verify nonce.
+	public function ajax_bulk_preview() {
 		check_ajax_referer( 'wpafi_bulk_nonce', 'nonce' );
 
-		// Check permissions.
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'edit_others_posts' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+		}
+
+		$options = get_option( 'wpafi_options' );
+		if ( empty( $options ) || ! is_array( $options ) ) {
+			wp_send_json_error( array( 'message' => 'No settings configured' ) );
+		}
+
+		$rule_idx   = isset( $_POST['ruleIdx'] ) ? sanitize_text_field( wp_unslash( $_POST['ruleIdx'] ) ) : 'all';
+		$targets    = $this->get_bulk_targets( $rule_idx, $options );
+		$query_args = $targets['query_args'];
+
+		$query_args['posts_per_page'] = 50;
+		$query_args['no_found_rows']  = false;
+		$query_args['paged']          = 1;
+
+		$query          = new WP_Query( $query_args );
+		$post_ids       = $query->posts;
+		$total_matching = (int) $query->found_posts;
+
+		$preview_rows = array();
+		$target_rules = $targets['target_rules'];
+
+		// Page through if needed to gather up to 50 matching candidates (scan ceiling: 200 posts).
+		$paged     = 1;
+		$max_scan  = 200;
+		$scanned   = 0;
+		$row_count = 0;
+
+		while ( ! empty( $post_ids ) && $row_count < 50 && $scanned < $max_scan ) {
+			foreach ( $post_ids as $post_id ) {
+				++$scanned;
+				$post = get_post( $post_id );
+				if ( ! $post ) {
+					continue;
+				}
+
+				$current_thumb_id   = get_post_thumbnail_id( $post_id );
+				$current_thumb_url  = $current_thumb_id ? wp_get_attachment_image_url( $current_thumb_id, 'thumbnail' ) : '';
+				$proposed_thumb_url = '';
+				$reason             = '';
+				$action             = 'skip';
+				$matched            = false;
+
+				if ( ! empty( $target_rules ) ) {
+					foreach ( $target_rules as $idx => $rule ) {
+						if ( isset( $rule['enabled'] ) && ! $rule['enabled'] ) {
+							continue;
+						}
+
+						if ( ! $this->does_rule_match( $post_id, $rule ) ) {
+							continue;
+						}
+
+						/* translators: %d: Rule number */
+						$rule_label = ! empty( $rule['name'] ) ? $rule['name'] : sprintf( __( 'Rule #%d', 'sny-auto-featured-image' ), $idx + 1 );
+
+						if ( $current_thumb_id && empty( $rule['overwrite'] ) ) {
+							/* translators: %s: Rule name/number */
+							$reason  = sprintf( __( '%s matched (Skipped: has image, overwrite OFF)', 'sny-auto-featured-image' ), $rule_label );
+							$action  = 'skip';
+							$matched = true;
+							break;
+						}
+
+						$source = isset( $rule['image_source'] ) ? $rule['image_source'] : 'media';
+						switch ( $source ) {
+							case 'first_image':
+								$include_video = ! empty( $rule['include_video'] );
+								$img_url       = $this->get_first_image_url_from_content( $post_id, $include_video );
+								if ( $img_url ) {
+									$proposed_thumb_url = $img_url;
+									/* translators: %s: Rule name/number */
+									$reason  = sprintf( __( '%s: First image from content', 'sny-auto-featured-image' ), $rule_label );
+									$action  = $current_thumb_id ? 'overwrite' : 'set';
+									$matched = true;
+								}
+								break;
+
+							case 'external':
+								if ( ! empty( $rule['external_url'] ) ) {
+									$proposed_thumb_url = $rule['external_url'];
+									/* translators: %s: Rule name/number */
+									$reason  = sprintf( __( '%s: External URL', 'sny-auto-featured-image' ), $rule_label );
+									$action  = $current_thumb_id ? 'overwrite' : 'set';
+									$matched = true;
+								}
+								break;
+
+							case 'media':
+							default:
+								if ( ! empty( $rule['image_id'] ) ) {
+									$proposed_thumb_url = wp_get_attachment_image_url( intval( $rule['image_id'] ), 'thumbnail' );
+									/* translators: %s: Rule name/number */
+									$reason  = sprintf( __( '%s: Media Library image', 'sny-auto-featured-image' ), $rule_label );
+									$action  = $current_thumb_id ? 'overwrite' : 'set';
+									$matched = true;
+								}
+								break;
+						}
+
+						if ( $matched ) {
+							break;
+						}
+					}
+				}
+
+				// Global fallback.
+				if ( ! $matched && 'all' === $rule_idx ) {
+					if ( $this->is_post_meeting_criteria( $post_id, $options ) ) {
+						$global_overwrite = ! empty( $options['wpafi_overwrite'] );
+						if ( ! $current_thumb_id || $global_overwrite ) {
+							if ( ! empty( $options['wpafi_auto_detect'] ) ) {
+								$img_url = $this->get_first_image_url_from_content( $post_id, true );
+								if ( $img_url ) {
+									$proposed_thumb_url = $img_url;
+									$reason             = __( 'Global: First image from content', 'sny-auto-featured-image' );
+									$action             = $current_thumb_id ? 'overwrite' : 'set';
+									$matched            = true;
+								}
+							}
+							if ( ! $matched && ! empty( $options['wpafi_default_thumb_id'] ) ) {
+								$proposed_thumb_url = wp_get_attachment_image_url( intval( $options['wpafi_default_thumb_id'] ), 'thumbnail' );
+								$reason             = __( 'Global: Default thumbnail', 'sny-auto-featured-image' );
+								$action             = $current_thumb_id ? 'overwrite' : 'set';
+								$matched            = true;
+							}
+						} else {
+							$reason = __( 'Skipped: Already has thumbnail', 'sny-auto-featured-image' );
+							$action = 'skip';
+						}
+					} else {
+						$reason = __( 'No matching criteria or rule', 'sny-auto-featured-image' );
+						$action = 'skip';
+					}
+				} elseif ( ! $matched ) {
+					$reason = __( 'No matching rule', 'sny-auto-featured-image' );
+					$action = 'skip';
+				}
+
+				/* translators: %d: Post ID */
+				$title = $post->post_title ? esc_html( $post->post_title ) : sprintf( __( '(no title #%d)', 'sny-auto-featured-image' ), $post_id );
+
+				$preview_rows[] = array(
+					'id'                 => $post_id,
+					'title'              => $title,
+					'post_type'          => $post->post_type,
+					'current_thumb_url'  => $current_thumb_url ? esc_url( $current_thumb_url ) : '',
+					'proposed_thumb_url' => $proposed_thumb_url ? esc_url( $proposed_thumb_url ) : '',
+					'reason'             => esc_html( $reason ),
+					'action'             => $action,
+				);
+				++$row_count;
+
+				if ( $row_count >= 50 ) {
+					break;
+				}
+			}
+
+			// If we haven't reached 50 rows and there are more posts in the query, fetch next page.
+			if ( $row_count < 50 && $scanned < $total_matching && $scanned < $max_scan ) {
+				++$paged;
+				$query_args['paged'] = $paged;
+				$next_query          = new WP_Query( $query_args );
+				$post_ids            = $next_query->posts;
+			} else {
+				break;
+			}
+		}
+
+		wp_send_json_success(
+			array(
+				'rows'           => $preview_rows,
+				'total_matching' => $total_matching,
+				'capped'         => $total_matching > 50,
+			)
+		);
+	}
+
+	/**
+	 * AJAX handler for bulk assigning featured images (capped at 50 posts for Free).
+	 */
+	public function ajax_bulk_assign() {
+		check_ajax_referer( 'wpafi_bulk_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'edit_others_posts' ) ) {
 			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
 		}
 
@@ -788,30 +1133,38 @@ class WPAFI_Admin {
 
 		$rule_idx = isset( $_POST['ruleIdx'] ) ? sanitize_text_field( wp_unslash( $_POST['ruleIdx'] ) ) : 'all';
 		$offset   = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
-		$limit    = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 50;
-		$updated  = 0;
-		$failed   = 0;
+		$limit    = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 10;
+		$max_cap  = 50;
 
-		// Get post IDs from transient or query fresh.
-		$batch_key = 'wpafi_bulk_' . get_current_user_id();
-		$post_ids  = get_transient( $batch_key );
-
-		if ( false === $post_ids ) {
-			// Transient expired - query fresh.
-			$targets  = $this->get_bulk_targets( $rule_idx, $options );
-			$args     = array(
-				'post_type'      => $targets['target_post_types'],
-				'post_status'    => 'publish',
-				'posts_per_page' => -1,
-				'fields'         => 'ids',
+		if ( $offset >= $max_cap ) {
+			wp_send_json_success(
+				array(
+					'message'     => __( 'Free version limit of 50 posts reached.', 'sny-auto-featured-image' ),
+					'updated'     => 0,
+					'failed'      => 0,
+					'processed'   => $max_cap,
+					'total'       => $max_cap,
+					'has_more'    => false,
+					'next_offset' => null,
+				)
 			);
-			$post_ids = get_posts( $args );
 		}
 
-		$total        = count( $post_ids );
-		$batch_ids    = array_slice( $post_ids, $offset, $limit );
-		$targets      = $this->get_bulk_targets( $rule_idx, $options );
-		$target_rules = $targets['target_rules'];
+		$batch_limit = min( $limit, $max_cap - $offset );
+		$targets     = $this->get_bulk_targets( $rule_idx, $options );
+		$args        = $targets['query_args'];
+
+		$args['posts_per_page'] = $batch_limit;
+		$args['offset']         = $offset;
+		$args['no_found_rows']  = false;
+
+		$query           = new WP_Query( $args );
+		$batch_ids       = $query->posts;
+		$total_matching  = (int) $query->found_posts;
+		$effective_total = min( $max_cap, $total_matching );
+		$updated         = 0;
+		$failed          = 0;
+		$target_rules    = $targets['target_rules'];
 
 		foreach ( $batch_ids as $post_id ) {
 			$image_id = null;
@@ -839,7 +1192,9 @@ class WPAFI_Admin {
 					$source = isset( $rule['image_source'] ) ? $rule['image_source'] : 'media';
 					switch ( $source ) {
 						case 'first_image':
-							$image_id = $this->get_first_image_from_content( $post_id );
+							$include_video = ! empty( $rule['include_video'] );
+							$sideload      = ! empty( $rule['sideload_external'] );
+							$image_id      = $this->get_first_image_from_content( $post_id, $include_video, $sideload );
 							break;
 						case 'external':
 							if ( ! empty( $rule['external_url'] ) ) {
@@ -884,29 +1239,26 @@ class WPAFI_Admin {
 		}
 
 		$processed   = $offset + count( $batch_ids );
-		$has_more    = $processed < $total;
+		$has_more    = $processed < $effective_total;
 		$next_offset = $has_more ? $processed : null;
-
-		// Clean up transient if done.
-		if ( ! $has_more ) {
-			delete_transient( $batch_key );
-		}
 
 		wp_send_json_success(
 			array(
-				'message'     => sprintf(
+				'message'        => sprintf(
 					/* translators: %1$d: number of posts updated, %2$d: number failed */
 					__( 'Processed %1$d posts: %2$d updated, %3$d failed.', 'sny-auto-featured-image' ),
 					count( $batch_ids ),
 					$updated,
 					$failed
 				),
-				'updated'     => $updated,
-				'failed'      => $failed,
-				'processed'   => $processed,
-				'total'       => $total,
-				'has_more'    => $has_more,
-				'next_offset' => $next_offset,
+				'updated'        => $updated,
+				'failed'         => $failed,
+				'processed'      => $processed,
+				'total'          => $effective_total,
+				'total_matching' => $total_matching,
+				'capped'         => $total_matching > $max_cap,
+				'has_more'       => $has_more,
+				'next_offset'    => $next_offset,
 			)
 		);
 	}

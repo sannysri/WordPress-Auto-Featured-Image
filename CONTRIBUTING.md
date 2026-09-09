@@ -1,4 +1,4 @@
-# Contributing to WP Auto Featured Image
+# Contributing to SNY Auto Featured Image
 
 Thank you for your interest in contributing!
 

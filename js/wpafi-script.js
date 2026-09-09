@@ -92,8 +92,6 @@ jQuery(document).ready(function ($) {
 
 			// Show remove button.
 			$('#delete_thumb').show();
-
-			wpafi.toast('Image selected successfully!', 'success');
 		});
 
 		mediaUploader.open();
@@ -109,7 +107,6 @@ jQuery(document).ready(function ($) {
 		);
 		$('#default_thumb_id').val('');
 		$(this).hide();
-		wpafi.toast('Image removed', 'warning');
 	});
 
 	function initSelect2(force = false) {
@@ -168,12 +165,137 @@ jQuery(document).ready(function ($) {
 	// Bulk Operations with Batched Processing
 	// ============================================
 
-	const BATCH_SIZE = 50; // Process 50 posts per batch.
+	const BATCH_SIZE = 10; // Process 10 posts per batch (capped at 50 max in free).
 	let bulkState = {
 		totalUpdated: 0,
 		totalFailed: 0,
 		cancelled: false,
 	};
+
+	// Preview button click handler.
+	$('#wpafi-bulk-preview-btn').on('click', function (e) {
+		e.preventDefault();
+		const $btn = $(this);
+		const $spinner = $('#wpafi-bulk-spinner');
+		const $container = $('#wpafi-preview-container');
+		const $tbody = $('#wpafi-preview-tbody');
+		const $badge = $('#wpafi-preview-count-badge');
+		const ruleIdx = $('#wpafi-bulk-rule').val();
+
+		$btn.prop('disabled', true);
+		$spinner.addClass('is-active');
+		$tbody.html(
+			'<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading preview...</td></tr>'
+		);
+		$container.show();
+
+		$.ajax({
+			url: wpafi_vars.ajax_url,
+			type: 'POST',
+			data: {
+				action: 'wpafi_bulk_preview',
+				nonce: wpafi_vars.bulk_nonce,
+				ruleIdx,
+			},
+			success(response) {
+				$btn.prop('disabled', false);
+				$spinner.removeClass('is-active');
+
+				if (!response.success) {
+					$tbody.html(
+						'<tr><td colspan="6" style="text-align: center; color: #d63638; padding: 20px;">' +
+							(response.data && response.data.message
+								? response.data.message
+								: 'Error generating preview.') +
+							'</td></tr>'
+					);
+					return;
+				}
+
+				const rows = response.data.rows || [];
+				const totalMatching = response.data.total_matching || 0;
+				const isCapped = response.data.capped;
+
+				$badge.text(
+					isCapped
+						? 'Showing 50 of ' + totalMatching + ' matching posts'
+						: totalMatching + ' posts found'
+				);
+
+				if (rows.length === 0) {
+					$tbody.html(
+						'<tr><td colspan="6" style="text-align: center; padding: 20px;">No published posts found matching criteria.</td></tr>'
+					);
+					return;
+				}
+
+				let html = '';
+				rows.forEach(function (r) {
+					const currentImg = r.current_thumb_url
+						? '<img src="' +
+							r.current_thumb_url +
+							'" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />'
+						: '<span style="color: #999; font-size: 11px;">(None)</span>';
+
+					const proposedImg = r.proposed_thumb_url
+						? '<img src="' +
+							r.proposed_thumb_url +
+							'" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />'
+						: '<span style="color: #999; font-size: 11px;">(No change)</span>';
+
+					let actionBadge = '';
+					if (r.action === 'set') {
+						actionBadge =
+							'<span style="background: #e7f5ea; color: #1e7e34; padding: 2px 6px; border-radius: 3px; font-weight: 600; font-size: 11px;">SET</span>';
+					} else if (r.action === 'overwrite') {
+						actionBadge =
+							'<span style="background: #fff3cd; color: #856404; padding: 2px 6px; border-radius: 3px; font-weight: 600; font-size: 11px;">REPLACE</span>';
+					} else {
+						actionBadge =
+							'<span style="background: #f8f9fa; color: #6c757d; padding: 2px 6px; border-radius: 3px; font-weight: 600; font-size: 11px;">SKIP</span>';
+					}
+
+					html +=
+						'<tr>' +
+						'<td>' +
+						r.id +
+						'</td>' +
+						'<td><strong>' +
+						r.title +
+						'</strong> <span style="color: #888; font-size: 11px;">(' +
+						r.post_type +
+						')</span></td>' +
+						'<td style="text-align: center;">' +
+						currentImg +
+						'</td>' +
+						'<td style="text-align: center;">' +
+						proposedImg +
+						'</td>' +
+						'<td>' +
+						r.reason +
+						'</td>' +
+						'<td style="text-align: center;">' +
+						actionBadge +
+						'</td>' +
+						'</tr>';
+				});
+
+				$tbody.html(html);
+			},
+			error() {
+				$btn.prop('disabled', false);
+				$spinner.removeClass('is-active');
+				$tbody.html(
+					'<tr><td colspan="6" style="text-align: center; color: #d63638; padding: 20px;">AJAX request failed. Please try again.</td></tr>'
+				);
+			},
+		});
+	});
+
+	// Hide preview table when selected rule changes.
+	$('#wpafi-bulk-rule').on('change', function () {
+		$('#wpafi-preview-container').hide();
+	});
 
 	$('#wpafi-bulk-assign').on('click', function (e) {
 		e.preventDefault();
@@ -357,7 +479,7 @@ jQuery(document).ready(function ($) {
 						bulkState.totalUpdated +
 						' posts updated, ' +
 						bulkState.totalFailed +
-						' failed.';
+						' failed. This cannot be undone on Free. Coming in Pro: 30-day undo log.';
 					finishBulkOperation(
 						$button,
 						$spinner,
@@ -512,8 +634,6 @@ jQuery(document).ready(function ($) {
 			.last()
 			.find('.wpafi-rule-collapsed-state')
 			.val('0');
-
-		wpafi.toast('New rule added', 'success');
 	});
 
 	// Remove Rule button handler (delegated).
@@ -523,7 +643,6 @@ jQuery(document).ready(function ($) {
 		updateAddRuleButton();
 		reindexAllRules();
 		updateRuleLimitText();
-		wpafi.toast('Rule removed', 'warning');
 	});
 
 	// Re-index all rules after add/remove to ensure consistent numbering.
@@ -644,7 +763,6 @@ jQuery(document).ready(function ($) {
 				);
 				$removeBtn.show();
 				$card.removeClass('wpafi-rule-error'); // Clear validation error.
-				wpafi.toast('Image selected', 'success');
 			});
 
 			mediaUploader.open();
@@ -668,7 +786,6 @@ jQuery(document).ready(function ($) {
 				'</div>'
 		);
 		$(this).hide();
-		wpafi.toast('Image removed', 'warning');
 	});
 
 	// ============================================
@@ -745,12 +862,10 @@ jQuery(document).ready(function ($) {
 			$card.removeClass('is-disabled');
 			$card.removeClass('is-collapsed');
 			$stateInput.val('0');
-			wpafi.toast('Rule enabled', 'success');
 		} else {
 			$card.addClass('is-disabled');
 			$card.addClass('is-collapsed');
 			$stateInput.val('1');
-			wpafi.toast('Rule disabled', 'warning');
 		}
 
 		// Update bulk rule dropdown sync.
@@ -836,10 +951,33 @@ jQuery(document).ready(function ($) {
 			const ruleName =
 				$card.find('.wpafi-rule-name').val() || 'Rule #' + (index + 1);
 
+			const imageSource = $card
+				.find('input[type="radio"][name$="[image_source]"]:checked')
+				.val();
+			let isInvalid = false;
+
+			if (imageSource === 'media' || !imageSource) {
+				if (!imageId || imageId === '0' || imageId === '') {
+					isInvalid = true;
+				}
+			} else if (imageSource === 'first_image') {
+				isInvalid = false;
+			} else if (imageSource === 'external') {
+				const externalUrl = $card
+					.find('input[name$="[external_url]"]')
+					.val();
+				if (!externalUrl || externalUrl.trim() === '') {
+					isInvalid = true;
+				}
+			}
+
 			// Check if image is selected.
-			if (!imageId || imageId === '0' || imageId === '') {
+			if (isInvalid) {
 				hasErrors = true;
-				errorMessages.push(ruleName + ': Please select an image');
+				errorMessages.push(
+					ruleName +
+						': Please select an image or provide a valid external URL'
+				);
 				$card.addClass('wpafi-rule-error');
 			} else {
 				$card.removeClass('wpafi-rule-error');
@@ -870,103 +1008,4 @@ jQuery(document).ready(function ($) {
 
 		return true;
 	});
-
-	// ==========================================================================
-	// Promotional Offer Banner
-	// ==========================================================================
-
-	/**
-	 * Initialize offer banner functionality
-	 */
-	function initOfferBanner() {
-		const $banner = $('.wpafi-offer-banner');
-		if (!$banner.length) {
-			return;
-		}
-
-		// Handle dismiss button.
-		$banner.on('click', '.wpafi-offer-dismiss', function (e) {
-			e.preventDefault();
-			$banner.addClass('dismissed');
-			sessionStorage.setItem('wpafi_offer_dismissed', '1');
-
-			// Remove from DOM after animation.
-			setTimeout(function () {
-				$banner.remove();
-			}, 300);
-		});
-
-		// Check if offer was previously dismissed (session-based).
-		if (sessionStorage.getItem('wpafi_offer_dismissed')) {
-			$banner.remove();
-			return;
-		}
-
-		// Initialize countdown timer if present.
-		const $countdown = $banner.find('.wpafi-offer-countdown');
-		if ($countdown.length) {
-			const endTime = $countdown.data('countdown');
-			if (endTime) {
-				initCountdownTimer(
-					$countdown.find('.wpafi-countdown-timer'),
-					endTime
-				);
-			}
-		}
-	}
-
-	/**
-	 * Initialize countdown timer
-	 *
-	 * @param {jQuery} $element Timer element.
-	 * @param {string} endTime  ISO 8601 datetime string.
-	 */
-	function initCountdownTimer($element, endTime) {
-		const end = new Date(endTime).getTime();
-
-		function updateTimer() {
-			const now = new Date().getTime();
-			const distance = end - now;
-
-			// If countdown finished.
-			if (distance < 0) {
-				$element.text('Expired');
-				$element.closest('.wpafi-offer-banner').addClass('dismissed');
-				setTimeout(function () {
-					$element.closest('.wpafi-offer-banner').remove();
-				}, 300);
-				return;
-			}
-
-			// Calculate time units.
-			const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-			const hours = Math.floor(
-				(distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-			);
-			const minutes = Math.floor(
-				(distance % (1000 * 60 * 60)) / (1000 * 60)
-			);
-			const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-			// Format display.
-			let display = '';
-			if (days > 0) {
-				display = days + 'd ' + hours + 'h ' + minutes + 'm';
-			} else if (hours > 0) {
-				display = hours + 'h ' + minutes + 'm ' + seconds + 's';
-			} else {
-				display = minutes + 'm ' + seconds + 's';
-			}
-
-			$element.text(display);
-
-			// Update every second.
-			setTimeout(updateTimer, 1000);
-		}
-
-		updateTimer();
-	}
-
-	// Initialize offer banner.
-	initOfferBanner();
 });

@@ -37,6 +37,9 @@ if ( ! defined( 'WPAFI_PLUGIN_URL' ) ) {
 // Mock common WordPress functions that may be called during coverage generation.
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( $option, $default = false ) {
+		if ( isset( $GLOBALS['wp_test_options'][ $option ] ) ) {
+			return $GLOBALS['wp_test_options'][ $option ];
+		}
 		return $default;
 	}
 }
@@ -156,6 +159,20 @@ if ( ! function_exists( 'wp_nonce_field' ) ) {
 if ( ! function_exists( 'settings_errors' ) ) {
 	function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {
 		return;
+	}
+}
+
+if ( ! class_exists( 'WP_Query' ) ) {
+	class WP_Query {
+		public $posts = array();
+		public $found_posts = 0;
+		public function __construct( $args = array() ) {
+			$GLOBALS['wp_test_last_query_args'] = $args;
+			if ( isset( $GLOBALS['wp_test_query_posts'] ) ) {
+				$this->posts = $GLOBALS['wp_test_query_posts'];
+				$this->found_posts = isset( $GLOBALS['wp_test_query_found_posts'] ) ? $GLOBALS['wp_test_query_found_posts'] : count( $this->posts );
+			}
+		}
 	}
 }
 

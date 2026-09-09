@@ -5,28 +5,30 @@
 [![WordPress Plugin Rating](https://img.shields.io/wordpress/plugin/stars/wp-auto-featured-image)](https://wordpress.org/plugins/wp-auto-featured-image/)
 [![License](https://img.shields.io/badge/license-GPL--2.0%2B-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 
-**Automatically set a default featured image** for your WordPress posts, pages, and custom post types. Save time and ensure every piece of content has a professional thumbnail!
+**SNY Auto Featured Image** automatically sets featured images for your WordPress posts, pages, and custom post types. Extract from content, use external URLs, set category defaults, or bulk-preview and apply to existing posts. Save time and ensure every piece of content has a professional thumbnail!
 
 ## Why Choose SNY Auto Featured Image?
 
-Never publish a post without a featured image again. This lightweight plugin automatically assigns your chosen default image whenever you publish or update content that lacks a featured image.
+Never publish a post without a featured image again. This lightweight plugin automatically assigns featured images based on your custom rules whenever you publish or update content.
 
 ## Key Features
 
-- ✅ **One-Click Setup** – Select any image from your media library as the default
-- ✅ **Custom Post Type Support** – Works with posts, pages, WooCommerce products, and any custom post type
-- ✅ **Category Filtering** – Set default images for specific categories only
-- ✅ **Tag Filtering** – Target posts with specific tags
-- ✅ **Non-Destructive** – Only adds images to posts without existing featured images
-- ✅ **Lightweight & Fast** – No bloat, minimal database queries
+- ✅ **Conditional Image Rules** – Set specific images based on post type, category, tag, or post status
+- ✅ **Multiple Image Sources** – Media Library, first image from content, or external image URLs
+- ✅ **Video Thumbnail Extraction** – Automatically extract thumbnails from embedded YouTube and Vimeo videos
+- ✅ **Safe Sideloading** – Download and store external images directly in your Media Library
+- ✅ **Bulk Preview & Apply** – Dry-run preview of thumbnail assignments with reasons before applying up to 50 posts
+- ✅ **Admin Post List Column** – View thumbnails directly in post/page list tables with configurable sizes
+- ✅ **Non-Destructive & Smart Overwrite** – Preserve existing hand-set thumbnails or selectively overwrite when needed
+- ✅ **Lightweight & Fast** – Built with native WordPress APIs, no bloat, and minimal database queries
 - ✅ **GDPR Compliant** – Does not collect any personal data
 
 ## Quick Setup
 
-1. Go to **Settings → SNY Auto Featured Image**
-2. Choose or upload an image from the media library
-3. Select your post types and categories
-4. Done! New posts will automatically get your default image
+1. Go to **Settings → SNY AFI**
+2. In the **Image Rules** tab, add a rule selecting your image source (Media Library, First Image in Content, or External URL)
+3. Choose your target post types, categories, or tags
+4. Visit **Bulk Operations** to preview and apply to existing posts, or simply publish new content!
 
 ## Perfect For
 
@@ -50,8 +52,18 @@ Never publish a post without a featured image again. This lightweight plugin aut
 3. Activate via the **Plugins** menu
 
 ## Screenshots
+ 
+- **Image Rules Tab** – Configure conditional rules with Media Library, first image from content, and category/tag filters:
+  ![Image Rules Tab](assets/screenshot-1.png)
 
-![Settings Page](assets/screenshot-1.png)
+- **Bulk Operations Preview** – Interactive dry-run preview comparing current vs proposed thumbnails with match reasons:
+  ![Bulk Operations Preview](assets/screenshot-2.png)
+
+- **Settings Tab** – Configure the admin post listing thumbnail column and customize preview thumbnail sizes:
+  ![Settings Tab](assets/screenshot-3.png)
+
+- **Posts List Column** – View thumbnail status directly in your WordPress posts list:
+  ![Posts List Column](assets/screenshot-4.png)
 
 ## Contributing
 
@@ -61,7 +73,7 @@ Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTIN
 
 ```bash
 # Clone the repository
-git clone https://github.com/developer/WordPress-Auto-Featured-Image.git
+git clone https://github.com/sannysri/WordPress-Auto-Featured-Image.git
 cd WordPress-Auto-Featured-Image
 
 # Install dependencies

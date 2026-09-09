@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Auto Featured Image by Sanny
+ * Plugin Name: SNY Auto Featured Image
  * Plugin URI: https://github.com/sannysri/WordPress-Auto-Featured-Image
- * Description: Auto-set featured images from content, external URLs, or category defaults. Bulk fix existing posts. Works with any post type.
+ * Description: SNY Auto Featured Image automatically sets featured images from content, external URLs, or defaults. Bulk preview & apply for existing posts.
  * Version: 2.1.0
  * Author: Sanny Srivastava
  * Author URI: https://sanny.dev/
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define Constants and Version.
 define( 'WPAFI_VERSION', '2.1.0' );
-define( 'WPAFI_PLUGIN_URL', WP_PLUGIN_URL . '/wp-auto-featured-image' );
+define( 'WPAFI_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 define( 'WPAFI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
 /**
@@ -50,8 +50,6 @@ function wpafi_has_pro_features() {
 
 // Include necessary files.
 require_once plugin_dir_path( __FILE__ ) . 'admin/class-wpafi-admin.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-wpafi-pro-registry.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/wpafi-pro-registry-functions.php';
 
 // Initialize the admin class.
 if ( class_exists( 'WPAFI_Admin' ) ) {
