@@ -1,0 +1,27 @@
+name: Update Readme & Assets on WordPress.org
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'readme.txt'
+      - 'assets/**'
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: Sync Readme & Assets to WP.org
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: WordPress.org Readme/Asset Update
+        uses: 10up/action-wordpress-plugin-asset-update@stable
+        env:
+          SVN_USERNAME: ${{ secrets.WP_ORG_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WP_ORG_PASSWORD }}
+          SLUG: wp-auto-featured-image
+          ASSETS_DIR: assets
+          IGNORE_OTHER_FILES: "true"

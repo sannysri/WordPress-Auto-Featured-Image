@@ -3,7 +3,7 @@ Contributors: sanny_rss
 Tags: auto featured image, featured image, first image, video thumbnail, bulk thumbnail
 Donate link: https://sanny.dev/?utm_source=wordpress_org&utm_medium=plugin&utm_campaign=auto-featured-image&utm_content=donate
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 2.1.0
 License: GPLv2 or later
@@ -98,6 +98,7 @@ Yes! In the Settings tab, enable the "Show featured image column in posts list" 
 * NEW: Bulk assign featured images to existing posts with safe preview.
 * NEW: Per-rule overwrite settings.
 * IMPROVED: Performance optimizations and sanitization routines.
+* Tested up to WordPress 7.1.
 
 = 2.0.3 =
 * Added review request notice after 7 days of plugin use.
