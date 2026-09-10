@@ -462,6 +462,7 @@ class AdminTest extends TestCase {
 
 		$reflection = new ReflectionClass( $this->admin );
 		$method     = $reflection->getMethod( 'get_bulk_targets' );
+		$method->setAccessible( true );
 
 		$result = $method->invoke( $this->admin, 0, $options );
 

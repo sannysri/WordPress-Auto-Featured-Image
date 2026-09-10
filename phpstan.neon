@@ -10,7 +10,7 @@ parameters:
 	ignoreErrors:
 		# WordPress functions accept mixed types
 		- '#Parameter .* of function esc_attr expects string, int given#'
-		- '#Constant WP_PLUGIN_URL not found#'
+		- '#Constant WPAFI_PLUGIN_URL not found#'
 
 # WordPress stubs for function/class definitions
 includes:
